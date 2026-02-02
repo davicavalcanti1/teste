@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets, fileText } from "lucide-react";
+import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets } from "lucide-react";
 import { format } from "date-fns";
 import { InspectionCharts } from "@/components/inspections/InspectionCharts";
 
