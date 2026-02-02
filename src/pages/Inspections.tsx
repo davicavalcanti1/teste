@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { useInspections } from "@/hooks/useInspections";
+import { useInspections, useInspectionDetails, InspectionOverview } from "@/hooks/useInspections";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets, fileText } from "lucide-react";
 import { format } from "date-fns";
-import { useInspectionDetails } from "@/hooks/useInspections";
+import { InspectionCharts } from "@/components/inspections/InspectionCharts";
 
-// --- SUB-COMPONENT: DETAILS DRAWER (NOW DIALOG) ---
+// --- SUB-COMPONENT: DETAILS DRAWER (DIALOG) ---
 function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo: string, open: boolean, onClose: () => void }) {
     const { data: rawData, isLoading } = useInspectionDetails(id, tipo);
     const data = rawData as any; // Bypass TS check for now
@@ -24,7 +25,7 @@ function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo
                 <DialogHeader>
                     <DialogTitle>Detalhes da Inspeção</DialogTitle>
                     <DialogDescription>
-                        {tipo.toUpperCase().replace("_", " ")} - ID: {id?.slice(0, 8)}
+                        {tipo?.toUpperCase().replace("_", " ")} - ID: {id?.slice(0, 8)}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -87,6 +88,18 @@ function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo
                                             {(!data.atividades || data.atividades.length === 0) && <li>Nenhuma atividade registrada</li>}
                                         </ul>
                                     </div>
+                                    {data.fotos_urls && data.fotos_urls.length > 0 && (
+                                        <div className="mt-4">
+                                            <p className="text-sm font-medium mb-2">Fotos:</p>
+                                            <div className="flex gap-2 overflow-x-auto pb-2">
+                                                {data.fotos_urls.map((url: string, i: number) => (
+                                                    <a key={i} href={url} target="_blank" rel="noreferrer">
+                                                        <img src={url} className="h-20 w-20 object-cover rounded border hover:opacity-80 transition-opacity" />
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </>
                             )}
 
@@ -118,27 +131,31 @@ function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo
 
 // --- MAIN PAGE ---
 export default function Inspections() {
-    const [filterType, setFilterType] = useState("todos");
     const [filterStatus, setFilterStatus] = useState("todos");
     const [filterDays, setFilterDays] = useState("30");
-
     const [selectedItem, setSelectedItem] = useState<{ id: string, tipo: string } | null>(null);
 
+    // Note: filterType is now handled by Tabs logic or filtering locally
     const { data: rawInspections = [], isLoading } = useInspections({
-        tipo: filterType,
+        tipo: "todos", // Fetch all, filter locally per tab to avoid request spam
         status: filterStatus,
         days: parseInt(filterDays)
     });
 
-    const inspections = rawInspections as any[]; // Bypass TS
+    const inspections = rawInspections as InspectionOverview[];
 
-    // Calculate stats
+    // Segregate Data
+    const dispenserData = inspections.filter(i => i.tipo === 'dispenser');
+    const banheiroData = inspections.filter(i => i.tipo === 'banheiro');
+    const acData = inspections.filter(i => i.tipo === 'ar_condicionado');
+
+    // Stats
     const stats = {
         total: inspections.length,
         open: inspections.filter(i => i.status === 'aberto').length,
-        ac: inspections.filter(i => i.tipo === 'ar_condicionado').length,
-        dispenser: inspections.filter(i => i.tipo === 'dispenser').length,
-        banheiro: inspections.filter(i => i.tipo === 'banheiro').length,
+        dispenser: dispenserData.length,
+        banheiro: banheiroData.length,
+        ac: acData.length,
     };
 
     const getIcon = (tipo: string) => {
@@ -156,112 +173,153 @@ export default function Inspections() {
         return <Badge variant="default" className="bg-green-600 hover:bg-green-700">Finalizado</Badge>;
     };
 
+    const renderTable = (data: any[], emptyMsg: string) => (
+        <div className="bg-white rounded-lg shadow border overflow-hidden mt-4">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Localização</TableHead>
+                        <TableHead>Detalhe / Resumo</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead></TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {isLoading ? (
+                        <TableRow><TableCell colSpan={7} className="text-center py-10"><Loader2 className="animate-spin h-6 w-6 inline" /></TableCell></TableRow>
+                    ) : data.length === 0 ? (
+                        <TableRow><TableCell colSpan={7} className="text-center py-10 text-muted-foreground">{emptyMsg}</TableCell></TableRow>
+                    ) : (
+                        data.map((item) => (
+                            <TableRow key={item.id} className="cursor-pointer hover:bg-gray-50" onClick={() => setSelectedItem({ id: item.id, tipo: item.tipo })}>
+                                <TableCell>{getIcon(item.tipo)}</TableCell>
+                                <TableCell className="font-medium capitalize">{item.tipo.replace("_", " ")}</TableCell>
+                                <TableCell>{item.localizacao}</TableCell>
+                                <TableCell className="max-w-[300px] truncate text-muted-foreground" title={item.resumo}>{item.resumo}</TableCell>
+                                <TableCell>{getStatusBadge(item.status)}</TableCell>
+                                <TableCell className="text-xs text-gray-500">{format(new Date(item.criado_em), "dd/MM/yy HH:mm")}</TableCell>
+                                <TableCell>
+                                    <Button variant="ghost" size="sm">Detalhes</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    );
+
     return (
         <MainLayout>
             <div className="flex flex-col gap-6">
-                <h1 className="text-2xl font-bold flex items-center gap-2 text-primary">
-                    <CheckCircle2 className="h-8 w-8" />
-                    Painel de Inspeções
-                </h1>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <h1 className="text-2xl font-bold flex items-center gap-2 text-primary">
+                        <CheckCircle2 className="h-8 w-8" />
+                        Painel de Inspeções
+                    </h1>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Card>
-                        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Total (Período)</CardTitle></CardHeader>
-                        <CardContent><div className="text-2xl font-bold">{stats.total}</div></CardContent>
-                    </Card>
-                    <Card className={stats.open > 0 ? "border-red-200 bg-red-50" : ""}>
-                        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-red-600">Chamados Abertos</CardTitle></CardHeader>
-                        <CardContent><div className="text-2xl font-bold text-red-700">{stats.open}</div></CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Ar Condicionado</CardTitle></CardHeader>
-                        <CardContent><div className="text-2xl font-bold">{stats.ac}</div></CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Banheiro / Dispenser</CardTitle></CardHeader>
-                        <CardContent><div className="text-2xl font-bold">{stats.banheiro + stats.dispenser}</div></CardContent>
-                    </Card>
-                </div>
-
-                {/* Filters */}
-                <div className="flex flex-col md:flex-row gap-4 items-end bg-white p-4 rounded-lg shadow-sm border">
-                    <div className="w-full md:w-48">
-                        <label className="text-xs font-semibold mb-1 block">Tipo</label>
-                        <Select value={filterType} onValueChange={setFilterType}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="todos">Todos</SelectItem>
-                                <SelectItem value="dispenser">Dispenser</SelectItem>
-                                <SelectItem value="banheiro">Banheiro</SelectItem>
-                                <SelectItem value="ar_condicionado">Ar Condicionado</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="w-full md:w-48">
-                        <label className="text-xs font-semibold mb-1 block">Status</label>
+                    {/* Global Filters */}
+                    <div className="flex gap-2">
                         <Select value={filterStatus} onValueChange={setFilterStatus}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="todos">Todos</SelectItem>
-                                <SelectItem value="aberto">Abertos (Pendentes)</SelectItem>
+                                <SelectItem value="todos">Status: Todos</SelectItem>
+                                <SelectItem value="aberto">Abertos</SelectItem>
                                 <SelectItem value="finalizado">Finalizados</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
-                    <div className="w-full md:w-48">
-                        <label className="text-xs font-semibold mb-1 block">Período</label>
                         <Select value={filterDays} onValueChange={setFilterDays}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="7">Últimos 7 dias</SelectItem>
-                                <SelectItem value="30">Últimos 30 dias</SelectItem>
-                                <SelectItem value="90">Últimos 3 meses</SelectItem>
+                                <SelectItem value="7">7 dias</SelectItem>
+                                <SelectItem value="30">30 dias</SelectItem>
+                                <SelectItem value="90">90 dias</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
-                    <Button variant="outline" onClick={() => { setFilterType("todos"); setFilterStatus("todos"); }} className="mb-[2px]">
-                        <Filter className="mr-2 h-4 w-4" /> Limpar
-                    </Button>
                 </div>
 
-                {/* Table */}
-                <div className="bg-white rounded-lg shadow border overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[50px]"></TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Localização</TableHead>
-                                <TableHead>Detalhe / Resumo</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Data</TableHead>
-                                <TableHead></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableRow><TableCell colSpan={7} className="text-center py-10"><Loader2 className="animate-spin h-6 w-6 inline" /></TableCell></TableRow>
-                            ) : inspections.length === 0 ? (
-                                <TableRow><TableCell colSpan={7} className="text-center py-10 text-muted-foreground">Nenhum registro encontrado no período.</TableCell></TableRow>
-                            ) : (
-                                inspections.map((item) => (
-                                    <TableRow key={item.id} className="cursor-pointer hover:bg-gray-50" onClick={() => setSelectedItem({ id: item.id, tipo: item.tipo })}>
-                                        <TableCell>{getIcon(item.tipo)}</TableCell>
-                                        <TableCell className="font-medium capitalize">{item.tipo.replace("_", " ")}</TableCell>
-                                        <TableCell>{item.localizacao}</TableCell>
-                                        <TableCell className="max-w-[300px] truncate text-muted-foreground" title={item.resumo}>{item.resumo}</TableCell>
-                                        <TableCell>{getStatusBadge(item.status)}</TableCell>
-                                        <TableCell className="text-xs text-gray-500">{format(new Date(item.criado_em), "dd/MM/yy HH:mm")}</TableCell>
-                                        <TableCell>
-                                            <Button variant="ghost" size="sm">Detalhes</Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:w-[800px] h-auto p-1 bg-white border shadow-sm rounded-xl">
+                        <TabsTrigger value="overview" className="py-2.5 rounded-lg data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">Visão Geral</TabsTrigger>
+                        <TabsTrigger value="dispenser" className="py-2.5 rounded-lg data-[state=active]:bg-cyan-50 data-[state=active]:text-cyan-700">Dispensers</TabsTrigger>
+                        <TabsTrigger value="banheiro" className="py-2.5 rounded-lg data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700">Banheiros</TabsTrigger>
+                        <TabsTrigger value="ac" className="py-2.5 rounded-lg data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">Climatização</TabsTrigger>
+                        <TabsTrigger value="reports" className="py-2.5 rounded-lg data-[state=active]:bg-gray-100">Relatórios</TabsTrigger>
+                    </TabsList>
+
+                    {/* --- Visão Geral --- */}
+                    <TabsContent value="overview" className="mt-6 space-y-6">
+                        {/* Stats Cards Breakdown */}
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <Card className="md:col-span-1 border-l-4 border-l-primary">
+                                <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">Total Geral</CardTitle></CardHeader>
+                                <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.total}</div></CardContent>
+                            </Card>
+                            <Card className={stats.open > 0 ? "md:col-span-1 border-red-200 bg-red-50" : "md:col-span-1"}>
+                                <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-red-600">Pendentes</CardTitle></CardHeader>
+                                <CardContent className="p-4 pt-0"><div className="text-2xl font-bold text-red-700">{stats.open}</div></CardContent>
+                            </Card>
+                            <Card className="md:col-span-1">
+                                <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">Ar Condicionado</CardTitle></CardHeader>
+                                <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.ac}</div></CardContent>
+                            </Card>
+                            <Card className="md:col-span-1">
+                                <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">Dispensers</CardTitle></CardHeader>
+                                <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.dispenser}</div></CardContent>
+                            </Card>
+                            <Card className="md:col-span-1">
+                                <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">Banheiros</CardTitle></CardHeader>
+                                <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.banheiro}</div></CardContent>
+                            </Card>
+                        </div>
+
+                        <InspectionCharts data={inspections} type="geral" />
+                        {renderTable(inspections, "Nenhum registro encontrado.")}
+                    </TabsContent>
+
+                    {/* --- Dispensers --- */}
+                    <TabsContent value="dispenser" className="mt-6 space-y-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <h2 className="text-lg font-semibold text-cyan-800">Dashboard de Dispensers</h2>
+                            <Badge variant="outline" className="text-cyan-600 bg-cyan-50">{dispenserData.length} Registros</Badge>
+                        </div>
+                        <InspectionCharts data={dispenserData} type="dispenser" />
+                        {renderTable(dispenserData, "Nenhuma inspeção de dispenser encontrada.")}
+                    </TabsContent>
+
+                    {/* --- Banheiros --- */}
+                    <TabsContent value="banheiro" className="mt-6 space-y-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <h2 className="text-lg font-semibold text-orange-800">Dashboard de Banheiros</h2>
+                            <Badge variant="outline" className="text-orange-600 bg-orange-50">{banheiroData.length} Registros</Badge>
+                        </div>
+                        <InspectionCharts data={banheiroData} type="banheiro" />
+                        {renderTable(banheiroData, "Nenhuma inspeção de banheiro encontrada.")}
+                    </TabsContent>
+
+                    {/* --- AC --- */}
+                    <TabsContent value="ac" className="mt-6 space-y-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <h2 className="text-lg font-semibold text-blue-800">Dashboard de Climatização</h2>
+                            <Badge variant="outline" className="text-blue-600 bg-blue-50">{acData.length} Registros</Badge>
+                        </div>
+                        <InspectionCharts data={acData} type="ar_condicionado" />
+                        {renderTable(acData, "Nenhuma manutenção de AC encontrada.")}
+                    </TabsContent>
+
+                    {/* --- Reports Preview --- */}
+                    <TabsContent value="reports" className="mt-6">
+                        <div className="p-8 text-center border-2 border-dashed rounded-xl bg-gray-50">
+                            <h3 className="text-lg font-medium text-gray-700">Central de Relatórios</h3>
+                            <p className="text-gray-500 mb-4">Exporte dados consolidados para análise externa.</p>
+                            <Button variant="outline" onClick={() => window.print()}>Exportar PDF (Print)</Button>
+                        </div>
+                    </TabsContent>
+                </Tabs>
 
                 {/* Details Drawer */}
                 {selectedItem && (
