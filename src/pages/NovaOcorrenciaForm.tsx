@@ -313,14 +313,16 @@ export default function NovaOcorrenciaForm() {
           dados_especificos: occurrence.dados_especificos,
           criado_em: occurrence.criado_em,
           criado_por: profile?.id,
+          criado_em: occurrence.criado_em,
+          criado_por: profile?.id,
           criado_por_nome: profile?.full_name,
-          link: `${window.location.origin}/ocorrencias/${occurrence.id}`,
+          link: `https://teste.imagoradiolgoia.cloud/ocorrencias/${occurrence.id}`,
           anexos: attachmentsForWebhook,
           timestamp: new Date().toISOString(),
         };
 
         // Fire and forget
-        fetch("https://n8n.imagoradiologia.cloud/webhook/envio", {
+        fetch("https://teste.imagoradiolgoia.cloud/webhook/envio", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(webhookPayload),

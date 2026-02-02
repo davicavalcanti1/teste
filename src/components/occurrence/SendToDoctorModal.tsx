@@ -110,7 +110,8 @@ export function SendToDoctorModal({
 
       // Generate public token in the browser
       const publicToken = generateSecureToken();
-      const publicLink = `${window.location.origin}/public/revisao-laudo/${publicToken}`;
+      // Using test domain as requested
+      const publicLink = `https://teste.imagoradiolgoia.cloud/public/revisao-laudo/${publicToken}`;
 
       // Get user for history
       const { data: userData } = await supabase.auth.getUser();
@@ -189,7 +190,7 @@ export function SendToDoctorModal({
       }
 
       // Send webhook to notify doctor
-      const webhookUrl = "https://n8n.imagoradiologia.cloud/webhook/medico";
+      const webhookUrl = "https://teste.imagoradiolgoia.cloud/webhook/medico";
 
       try {
         await fetch(webhookUrl, {
