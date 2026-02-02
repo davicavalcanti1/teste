@@ -101,7 +101,7 @@ ${linkFinalizar}`;
 
     if (isSuccess) {
         return (
-            <PublicFormLayout title="Banheiros" subtitle="Abrir Chamado" colorTheme="orange">
+            <PublicFormLayout title="Banheiros" subtitle="Abrir Chamado">
                 <div className="p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
                     <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                         <CheckCircle className="h-8 w-8 text-green-600" />
@@ -119,7 +119,7 @@ ${linkFinalizar}`;
     }
 
     return (
-        <PublicFormLayout title="Banheiros" subtitle="Abrir Chamado" colorTheme="orange">
+        <PublicFormLayout title="Banheiros" subtitle="Abrir Chamado">
             <div className="p-6">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

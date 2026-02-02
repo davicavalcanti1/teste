@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PublicFormLayout } from "@/layouts/PublicFormLayout";
 import { acSchema, ACForm as ACFormType } from "@/types/inspection-forms";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, CheckCircle2, Snowflake } from "lucide-react";
+import { Loader2, CheckCircle2, Snowflake, UploadCloud, X, Camera } from "lucide-react";
 
 interface ACFormProps {
     variant: "imago" | "terceirizado" | "dreno";
@@ -22,6 +22,8 @@ export default function ACForm({ variant }: ACFormProps) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Pre-fill from URL
     const sala = searchParams.get("sala") || "";
@@ -46,31 +48,82 @@ export default function ACForm({ variant }: ACFormProps) {
         if (sala) form.setValue("localizacao", sala);
         if (modelo) form.setValue("modelo", modelo);
         if (serie) form.setValue("numero_serie", serie);
-        // Force variant as origin
         form.setValue("origem", variant);
     }, [sala, modelo, serie, variant, form]);
 
-    const onSubmit = async (data: ACFormType) => {
-        setIsSubmitting(true);
-        try {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+        }
+    };
 
-            // Build activity log
+    const removeFile = (index: number) => {
+        setFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const onSubmit = async (data: ACFormType) => {
+        // Validation for Mandatory Photos
+        if ((variant === 'terceirizado' || variant === 'dreno') && files.length === 0) {
+            toast({
+                title: "Fotos obrigatórias",
+                description: "Por favor, anexe pelo menos uma foto do serviço.",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        setIsSubmitting(true);
+        setUploadProgress(0);
+
+        try {
+            const uploadedUrls: string[] = [];
+
+            // 1. Upload Images
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    const filePath = `${fileName}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('inspection-images')
+                        .upload(filePath, file);
+
+                    if (uploadError) {
+                        console.error("Upload error:", uploadError);
+                        // If bucket doesn't exist, we might fail here. 
+                        // We will continue but warn user or just skip image.
+                        // For now, let's throw to stop process.
+                        throw new Error(`Erro ao enviar imagem: ${uploadError.message}. Verifique se o bucket 'inspection-images' existe.`);
+                    }
+
+                    const { data: publicUrlData } = supabase.storage
+                        .from('inspection-images')
+                        .getPublicUrl(filePath);
+
+                    uploadedUrls.push(publicUrlData.publicUrl);
+                    setUploadProgress(Math.round(((i + 1) / files.length) * 100));
+                }
+            }
+
+            // 2. Build activity log
             const atividades = [];
             if (data.limpeza_filtro) atividades.push("Limpeza de Filtro");
             if (data.limpeza_carenagem) atividades.push("Limpeza de Carenagem");
             if (data.teste_funcionamento) atividades.push("Teste de Funcionamento/Gás");
             if (variant === 'dreno') atividades.push("Limpeza de Dreno");
+            if (variant === 'terceirizado') atividades.push("Serviço Terceirizado");
 
-            // Save to Supabase (AC Table)
-            // Cast to any to bypass missing type definitions locally
+            // 3. Save to Supabase
             const { error } = await supabase.from("inspections_ac" as any).insert({
                 localizacao: data.localizacao,
                 origem: variant,
                 modelo: data.modelo,
                 numero_serie: data.numero_serie,
-                atividades: atividades, // Save as JSON array
+                atividades: atividades,
                 observacoes: data.observacoes,
-                // fotos_urls: [] // TODO: Add file upload logic if needed later
+                fotos_urls: uploadedUrls
             });
 
             if (error) throw error;
@@ -104,7 +157,7 @@ export default function ACForm({ variant }: ACFormProps) {
 
     if (isSuccess) {
         return (
-            <PublicFormLayout title={getTitle()} colorTheme="blue">
+            <PublicFormLayout title={getTitle()}>
                 <div className="p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
                     <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                         <CheckCircle2 className="h-8 w-8 text-blue-600" />
@@ -122,11 +175,12 @@ export default function ACForm({ variant }: ACFormProps) {
     }
 
     return (
-        <PublicFormLayout title={getTitle()} subtitle={sala} colorTheme="blue">
+        <PublicFormLayout title={getTitle()} subtitle={sala}>
             <div className="p-6">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
+                        {/* Read-only fields */}
                         <div className="grid grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
@@ -166,86 +220,66 @@ export default function ACForm({ variant }: ACFormProps) {
                             />
                         </div>
 
-                        <div className="space-y-4 border rounded-lg p-4 bg-gray-50/50">
-                            <h3 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                                <Snowflake className="h-4 w-4" />
-                                Checklist Realizado
-                            </h3>
+                        {/* Checklist Section - ONLY for Imago */}
+                        {variant === 'imago' && (
+                            <div className="space-y-4 border rounded-lg p-4 bg-gray-50/50">
+                                <h3 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                                    <Snowflake className="h-4 w-4" />
+                                    Checklist Realizado
+                                </h3>
 
-                            <FormField
-                                control={form.control}
-                                name="limpeza_filtro"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>Limpeza do Filtro</FormLabel>
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
+                                <FormField
+                                    control={form.control}
+                                    name="limpeza_filtro"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel>Limpeza do Filtro</FormLabel>
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
 
-                            <FormField
-                                control={form.control}
-                                name="limpeza_carenagem"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>Limpeza Carenagem</FormLabel>
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
+                                <FormField
+                                    control={form.control}
+                                    name="limpeza_carenagem"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel>Limpeza Carenagem</FormLabel>
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+                                {/* Teste de funcionamento removido conforme pedido */}
+                            </div>
+                        )}
 
-                            <FormField
-                                control={form.control}
-                                name="teste_funcionamento"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>Teste de Gás/Funcionamento</FormLabel>
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
-
-                            {variant === 'dreno' && (
-                                <div className="flex flex-row items-start space-x-3 space-y-0 opacity-50">
-                                    <Checkbox checked disabled />
-                                    <div className="space-y-1 leading-none">
-                                        <FormLabel>Limpeza de Dreno (Obrigatório)</FormLabel>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
+                        {/* Observations / Text Field */}
                         <FormField
                             control={form.control}
                             name="observacoes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Observações</FormLabel>
+                                    <FormLabel>
+                                        {(variant === 'terceirizado' || variant === 'dreno') ? "Descrição do Serviço Realizado" : "Observações"}
+                                    </FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="Alguma anomalia?"
-                                            className="resize-none"
+                                            placeholder="Detalhe o que foi feito..."
+                                            className="resize-none h-32"
                                             {...field}
                                         />
                                     </FormControl>
@@ -254,12 +288,39 @@ export default function ACForm({ variant }: ACFormProps) {
                             )}
                         />
 
+                        {/* Image Upload Section */}
+                        <div className="space-y-3">
+                            <FormLabel className="flex items-center gap-2">
+                                <Camera className="h-4 w-4" />
+                                Fotos do Serviço
+                                {(variant === 'terceirizado' || variant === 'dreno') && <span className="text-red-500 font-bold ml-1">* Obrigatório</span>}
+                            </FormLabel>
+
+                            <div className="flex flex-wrap gap-4">
+                                {files.map((file, index) => (
+                                    <div key={index} className="relative w-20 h-20 border rounded-md overflow-hidden bg-gray-100">
+                                        <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-full object-cover opacity-80" />
+                                        <button type="button" onClick={() => removeFile(index)} className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl-md hover:bg-red-600">
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <label className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 bg-white">
+                                    <UploadCloud className="h-6 w-6 text-gray-400 mb-1" />
+                                    <span className="text-[10px] text-gray-500">Adicionar</span>
+                                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileChange} />
+                                </label>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Tire fotos do antes e depois se possível.</p>
+                        </div>
+
                         <div className="pt-2">
                             <Button type="submit" className="w-full h-12 text-lg bg-blue-900 hover:bg-blue-800" disabled={isSubmitting}>
                                 {isSubmitting ? (
                                     <>
                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                        Salvando...
+                                        {uploadProgress > 0 ? `Enviando ${uploadProgress}%` : "Salvando..."}
                                     </>
                                 ) : (
                                     "Registrar Manutenção"

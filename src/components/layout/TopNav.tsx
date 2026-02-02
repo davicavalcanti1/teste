@@ -11,7 +11,8 @@ import {
   ChevronDown,
   SlidersHorizontal,
   Package,
-  BookOpen
+  BookOpen,
+  CheckCircle2
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -43,6 +44,7 @@ export function TopNav() {
     { href: "/", label: "Início", icon: Home, adminOnly: false },
     { href: "/ocorrencias", label: "Ocorrências", icon: FileText, adminOnly: false },
     { href: "/kanbans", label: "Kanbans", icon: Columns3, adminOnly: false },
+    { href: "/inspecoes", label: "Inspeções", icon: CheckCircle2, adminOnly: false },
     { href: "/analise", label: "Análise", icon: SlidersHorizontal, adminOnly: true },
     { href: "/relatorios", label: "Dashboard", icon: BarChart3, adminOnly: false },
     { href: "/livro", label: "Livro", icon: BookOpen, adminOnly: false },
@@ -52,23 +54,19 @@ export function TopNav() {
 
     // Explicit exclusions for RH and Enfermagem
     if (role === 'rh') {
-      // RH sees Home, Ocorrencias, Kanbans, Dashboard (restricted)
+      // RH sees Home, Ocorrencias, Kanbans, Inspecoes, Dashboard (restricted)
       if (link.href === '/analise') return false;
     }
 
     if (role === 'enfermagem') {
-      // Enfermagem sees Home, Ocorrencias, Kanbans, Dashboard (restricted)
-      if (link.href === '/analise') return false;
-    }
-
-    if (role === 'enfermagem') {
-      // Enfermagem sees Home, Ocorrencias, Kanbans, Dashboard (restricted)
+      // Enfermagem sees Home, Ocorrencias, Kanbans, Inspecoes, Dashboard (restricted)
       if (link.href === '/analise') return false;
     }
 
     if (role === 'user') {
       if (link.href === '/livro') return false;
       if (link.href === '/analise') return false;
+      if (link.href === '/inspecoes') return false;
     }
 
     // Default role checks (if any specific allowedRoles existed, check them)

@@ -17,7 +17,7 @@ export function PublicFormLayout({
 }: PublicFormLayoutProps) {
 
     const themeColors = {
-        blue: "bg-blue-600",
+        blue: "bg-[#1e3a8a]", // Darker blue
         green: "bg-green-600",
         purple: "bg-purple-600",
         orange: "bg-orange-600",

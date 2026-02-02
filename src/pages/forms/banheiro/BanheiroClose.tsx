@@ -124,7 +124,7 @@ Local: ${closedLocation}`;
 
     if (isLoading) {
         return (
-            <PublicFormLayout title="Banheiros" colorTheme="orange">
+            <PublicFormLayout title="Banheiros">
                 <div className="flex justify-center py-10">
                     <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
                 </div>
@@ -134,7 +134,7 @@ Local: ${closedLocation}`;
 
     if (errorMsg) {
         return (
-            <PublicFormLayout title="Banheiros" colorTheme="orange">
+            <PublicFormLayout title="Banheiros">
                 <div className="p-8 text-center flex flex-col items-center">
                     <AlertTriangle className="h-12 w-12 text-yellow-500 mb-4" />
                     <h2 className="text-xl font-bold text-gray-800 mb-2">Atenção</h2>
@@ -146,7 +146,7 @@ Local: ${closedLocation}`;
 
     if (isSuccess) {
         return (
-            <PublicFormLayout title="Banheiros" colorTheme="orange">
+            <PublicFormLayout title="Banheiros">
                 <div className="p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
                     <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                         <CheckCircle2 className="h-8 w-8 text-blue-600" />
@@ -161,7 +161,7 @@ Local: ${closedLocation}`;
     }
 
     return (
-        <PublicFormLayout title="Finalizar Chamado" subtitle={`Banheiro - ${ticketData?.localizacao || protocoloParam}`} colorTheme="orange">
+        <PublicFormLayout title="Finalizar Chamado" subtitle={`Banheiro - ${ticketData?.localizacao || protocoloParam}`}>
             <div className="p-6">
                 {ticketData && (
                     <div className="mb-6 p-4 bg-orange-50 rounded-lg border border-orange-100">
