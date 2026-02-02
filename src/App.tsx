@@ -35,6 +35,12 @@ import AdminKanban from "./pages/AdminKanban";
 import NursingSubtypeSelection from "./pages/nursing-occurrence/NursingSubtypeSelection";
 import Instructions from "./pages/Instructions";
 import PublicImageGallery from "./pages/PublicImageGallery";
+import DispenserOpen from "./pages/forms/dispenser/DispenserOpen";
+import DispenserClose from "./pages/forms/dispenser/DispenserClose";
+import BanheiroOpen from "./pages/forms/banheiro/BanheiroOpen";
+import BanheiroClose from "./pages/forms/banheiro/BanheiroClose";
+import ACForm from "./pages/forms/ac/ACForm";
+import Inspections from "./pages/Inspections";
 
 const queryClient = new QueryClient();
 
@@ -164,6 +170,13 @@ const App = () => (
               </ProtectedRoute>
             } />
 
+            {/* Inspections Dashboard (Admin/Nursing) */}
+            <Route path="/inspecoes" element={
+              <ProtectedRoute allowedRoles={['admin', 'enfermagem', 'rh']}>
+                <Inspections />
+              </ProtectedRoute>
+            } />
+
             {/* Generic Details Route - Must be last in /ocorrencias list */}
             <Route path="/ocorrencias/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'user', 'rh', 'enfermagem']}>
@@ -175,6 +188,17 @@ const App = () => (
             <Route path="/public/revisao-laudo/:token" element={<PublicRevisaoLaudo />} />
             <Route path="/public/imagens/:token" element={<PublicImageGallery />} />
             <Route path="/instrucoes" element={<Instructions />} />
+
+            {/* Public Inspection Forms */}
+            <Route path="/formularios/dispenser/abrir" element={<DispenserOpen />} />
+            <Route path="/formularios/dispenser/finalizar" element={<DispenserClose />} />
+            <Route path="/formularios/banheiro/abrir" element={<BanheiroOpen />} />
+            <Route path="/formularios/banheiro/finalizar" element={<BanheiroClose />} />
+
+            {/* AC Forms */}
+            <Route path="/formularios/ar-condicionado/imago" element={<ACForm variant="imago" />} />
+            <Route path="/formularios/ar-condicionado/terceirizado" element={<ACForm variant="terceirizado" />} />
+            <Route path="/formularios/ar-condicionado/dreno" element={<ACForm variant="dreno" />} />
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

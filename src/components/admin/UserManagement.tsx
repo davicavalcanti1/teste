@@ -389,6 +389,14 @@ export function UserManagement() {
           <p className="text-sm text-muted-foreground">
             Adicione e gerencie os usuários do sistema
           </p>
+          {/* Debug Info */}
+          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800 font-mono">
+            Debugging:
+            <br />Tenant ID: {profile?.tenant_id}
+            <br />App Role: {profile?.role}
+            <br />Users Found: {users.length}
+            <br />RLS Active on Profiles? (Likely Yes)
+          </div>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
