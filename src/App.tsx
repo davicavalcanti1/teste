@@ -18,6 +18,8 @@ import NotFound from "./pages/NotFound";
 import Instructions from "./pages/Instructions";
 
 // Occurrence pages
+import OcorrenciasMenu from "./features/occurrences/pages/OcorrenciasMenu";
+import AnaliseHistorico from "./pages/Analise";
 import Ocorrencias from "./features/occurrences/pages/Ocorrencias";
 import OccurrenceDetail from "./features/occurrences/pages/OccurrenceDetail";
 import OccurrenceBook from "./features/occurrences/pages/OccurrenceBook";
@@ -73,7 +75,17 @@ const App = () => (
             } />
             <Route path="/ocorrencias" element={
               <ProtectedRoute allowedRoles={['admin', 'user', 'rh', 'enfermagem']}>
-                <Ocorrencias />
+                <OcorrenciasMenu />
+              </ProtectedRoute>
+            } />
+            <Route path="/ocorrencias/dashboard" element={
+              <ProtectedRoute allowedRoles={['admin', 'user', 'rh', 'enfermagem']}>
+                <Relatorios />
+              </ProtectedRoute>
+            } />
+            <Route path="/ocorrencias/historico" element={
+              <ProtectedRoute allowedRoles={['admin', 'user', 'rh', 'enfermagem']}>
+                <AnaliseHistorico />
               </ProtectedRoute>
             } />
 
