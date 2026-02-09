@@ -65,7 +65,7 @@ const typeConfig: Record<OccurrenceType, {
     bgColor: "bg-primary/10",
     borderColor: "border-primary/20",
     hoverColor: "hover:border-primary",
-    hidden: true, // Hidden for now, will be enabled later
+    hidden: false, // Hidden for now, will be enabled later
   },
   simples: {
     title: "Ocorrência Simplificada",
@@ -94,12 +94,12 @@ const typeConfig: Record<OccurrenceType, {
     bgColor: "bg-primary/10",
     borderColor: "border-primary/20",
     hoverColor: "hover:border-primary",
-    hidden: true,
+    hidden: false,
   }
 };
 
 // Only show types that are not hidden
-const typeOrder: OccurrenceType[] = ["simples", "revisao_exame", "enfermagem"];
+const typeOrder: OccurrenceType[] = ["simples", "revisao_exame", "enfermagem", "administrativa", "livre"];
 
 // Subtype icons
 const subtypeIcons: Record<OccurrenceSubtype, typeof Heart> = {
@@ -124,6 +124,14 @@ export default function NovaOcorrenciaWizard() {
     }
     if (type === "simples") {
       navigate(`/ocorrencias/nova/simples`);
+      return;
+    }
+    if (type === "administrativa") {
+      navigate(`/ocorrencias/nova/administrativa`);
+      return;
+    }
+    if (type === "livre") {
+      navigate(`/ocorrencias/nova-livre`);
       return;
     }
     setSelectedType(type);
