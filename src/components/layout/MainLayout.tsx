@@ -1,4 +1,5 @@
 import { TopNav } from "./TopNav";
+import { Sidebar } from "./Sidebar";
 import imagoLoginCover from "@/assets/imago-login-cover.png";
 
 interface MainLayoutProps {
@@ -18,14 +19,29 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background/80 to-background/95" />
       </div>
 
-      <div className="relative z-10 flex flex-col min-h-screen">
-        <TopNav />
-        <main className="container px-4 py-6 md:px-6 md:py-8 flex-1 animate-fade-in">
-          {children}
-        </main>
-        <footer className="py-4 text-center text-xs text-muted-foreground border-t bg-background/50 backdrop-blur-sm">
-          Imago 2026 Productions Version 1.1
-        </footer>
+      <div className="relative z-10 flex min-h-screen flex-col lg:flex-row">
+        {/* Desktop Sidebar */}
+        <Sidebar />
+
+        {/* Mobile Top Nav */}
+        <div className="lg:hidden">
+          <TopNav />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+          <main className="flex-1 container px-4 py-6 md:px-8 md:py-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {children}
+          </main>
+
+          <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border/40 bg-background/30 backdrop-blur-sm mt-auto">
+            <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
+              <span className="text-balance text-center leading-loose">
+                Imago 2026 Productions Version 1.1
+              </span>
+            </div>
+          </footer>
+        </div>
       </div>
     </div>
   );
