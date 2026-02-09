@@ -99,10 +99,10 @@ export function Sidebar() {
                             key={link.href}
                             to={link.href}
                             className={cn(
-                                "group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden",
+                                "group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300 relative overflow-visible hover:scale-105 hover:-translate-y-0.5 hover:shadow-lg hover:z-10",
                                 isActive
-                                    ? "bg-blue-100 text-blue-700 shadow-sm" // Active state
-                                    : "text-blue-600/80 hover:bg-blue-100/50 hover:text-blue-800" // Inactive state
+                                    ? "bg-blue-100 text-blue-700 shadow-md ring-1 ring-blue-200" // Active state
+                                    : "text-blue-600/80 hover:bg-white hover:text-blue-900" // Inactive state
                             )}
                         >
                             {/* Active Indicator Bar */}
