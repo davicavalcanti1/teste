@@ -10,7 +10,7 @@ import Auth from "./pages/Auth";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 // Shared pages
-import Analise from "./pages/Analise";
+import AnamneseExternal from "./pages/AnamneseExternal";
 import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
 import Perfil from "./pages/Perfil";
@@ -158,7 +158,7 @@ const App = () => (
             {/* Protected routes - admin only */}
             <Route path="/analise" element={
               <ProtectedRoute requireAdmin>
-                <Analise />
+                <AnamneseExternal />
               </ProtectedRoute>
             } />
             <Route path="/relatorios" element={
