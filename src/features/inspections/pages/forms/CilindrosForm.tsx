@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
-import { Loader2, CheckCircle2, UploadCloud, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle2, UploadCloud, CheckCircle, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { PublicFormLayout } from "@/layouts/PublicFormLayout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -386,36 +386,61 @@ export default function CilindrosForm() {
                                 </Alert>
                             )}
 
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative group">
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                    disabled={uploading}
-                                />
-                                <div className="flex flex-col items-center gap-3">
-                                    {uploading ? (
-                                        <>
-                                            <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
-                                            <p className="font-medium text-purple-700">Salvando foto no banco...</p>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="bg-gray-100 p-3 rounded-full group-hover:bg-gray-200 transition-colors">
-                                                <UploadCloud className="h-8 w-8 text-gray-500" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-medium text-gray-700">
-                                                    {uploadedUrls.length > 0
-                                                        ? "Adicionar mais fotos"
-                                                        : "Toque para adicionar fotos"}
-                                                </p>
-                                                <p className="text-xs text-gray-400">Tire fotos dos manômetros e estoque.</p>
-                                            </div>
-                                        </>
-                                    )}
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* Tirar Foto (abre câmera diretamente) */}
+                                <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:bg-purple-50 transition-colors cursor-pointer relative group">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        capture="environment"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        disabled={uploading}
+                                    />
+                                    <div className="flex flex-col items-center gap-2">
+                                        {uploading ? (
+                                            <>
+                                                <Loader2 className="h-7 w-7 text-purple-600 animate-spin" />
+                                                <p className="font-medium text-purple-700 text-sm">Salvando...</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="bg-purple-100 p-3 rounded-full group-hover:bg-purple-200 transition-colors">
+                                                    <Camera className="h-7 w-7 text-purple-600" />
+                                                </div>
+                                                <p className="font-medium text-purple-700 text-sm">Tirar Foto</p>
+                                                <p className="text-xs text-gray-400">Abrir câmera</p>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Selecionar da Galeria */}
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer relative group">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        disabled={uploading}
+                                    />
+                                    <div className="flex flex-col items-center gap-2">
+                                        {uploading ? (
+                                            <>
+                                                <Loader2 className="h-7 w-7 text-purple-600 animate-spin" />
+                                                <p className="font-medium text-purple-700 text-sm">Salvando...</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="bg-gray-100 p-3 rounded-full group-hover:bg-gray-200 transition-colors">
+                                                    <UploadCloud className="h-7 w-7 text-gray-500" />
+                                                </div>
+                                                <p className="font-medium text-gray-700 text-sm">Galeria</p>
+                                                <p className="text-xs text-gray-400">Selecionar fotos</p>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
