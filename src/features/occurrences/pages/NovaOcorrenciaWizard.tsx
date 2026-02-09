@@ -108,6 +108,7 @@ const subtypeIcons: Record<OccurrenceSubtype, typeof Heart> = {
   agendamento: CalendarX,
   extravasamento_enfermagem: Droplets,
   reacoes_adversas: Heart, // Or AlertTriangle if available
+  livre: FileText,
 };
 
 export default function NovaOcorrenciaWizard() {
@@ -162,14 +163,17 @@ export default function NovaOcorrenciaWizard() {
     <MainLayout>
       <div className="mx-auto max-w-3xl animate-fade-in">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {step === 2 ? "Voltar para tipos" : "Voltar ao Painel"}
-        </Button>
+        {/* Back Button - Only show on step 2 */}
+        {step > 1 && (
+          <Button
+            variant="ghost"
+            className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+            onClick={handleBack}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar para tipos
+          </Button>
+        )}
 
         {/* Progress Indicator */}
         <div className="flex items-center gap-2 mb-6">
