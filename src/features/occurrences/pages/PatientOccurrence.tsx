@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCreatePatientOccurrence } from "@/features/occurrences/hooks/usePatientOccurrence";
-import { useUploadAttachments } from "@/features/occurrences/hooks/useAttachments";
+import { uploadFilesToStorage } from "@/features/occurrences/hooks/useAttachments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +14,7 @@ import { AttachmentUpload, PendingFile } from "@/features/occurrences/components
 export default function PublicPatientOccurrence() {
     const navigate = useNavigate();
     const { mutateAsync: submit, isPending } = useCreatePatientOccurrence();
-    const uploadAttachments = useUploadAttachments();
+
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,20 +29,41 @@ export default function PublicPatientOccurrence() {
         descricao: ""
     });
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
-            // Create the occurrence first
+            const occurrenceId = crypto.randomUUID();
+            let uploadedAttachments: any[] = [];
+
+            // Upload attachments first if any
+            if (pendingFiles.length > 0) {
+                try {
+                    uploadedAttachments = await uploadFilesToStorage(
+                        pendingFiles.map(pf => pf.file),
+                        occurrenceId,
+                        'anonymous'
+                    );
+                } catch (uploadError) {
+                    console.error("Error uploading attachments:", uploadError);
+                    // Continue without attachments if upload fails? Or show error?
+                    // For now, let's log and continue, as the main form submission is more important.
+                }
+            }
+
+            // Create the occurrence
             const occurrence = await submit({
+                id: occurrenceId,
                 descricao_detalhada: formData.descricao,
                 is_anonymous: isAnonymous,
                 paciente_nome_completo: isAnonymous ? undefined : formData.nome,
                 paciente_telefone: isAnonymous ? undefined : formData.telefone,
                 paciente_data_nascimento: isAnonymous ? undefined : formData.dataNascimento,
                 setor: formData.setor,
-                data_ocorrencia: formData.dataOcorrencia
+                data_ocorrencia: formData.dataOcorrencia,
+                anexos: uploadedAttachments
             });
 
             // Send webhook to n8n
@@ -57,25 +78,14 @@ export default function PublicPatientOccurrence() {
                         patient_phone: formData.telefone,
                         sector: formData.setor,
                         description: formData.descricao,
-                        is_anonymous: isAnonymous
+                        is_anonymous: isAnonymous,
+                        attachments_count: uploadedAttachments.length
                     })
                 });
             } catch (webhookErr) {
                 console.error("Webhook failed:", webhookErr);
             }
 
-            // Upload attachments if any
-            if (pendingFiles.length > 0 && occurrence?.id) {
-                try {
-                    await uploadAttachments.mutateAsync({
-                        occurrenceId: occurrence.id,
-                        files: pendingFiles.map(pf => pf.file),
-                        userId: 'anonymous', // Patient occurrences are public
-                    });
-                } catch (uploadError) {
-                    console.error("Error uploading attachments:", uploadError);
-                }
-            }
 
             // Clear form on success
             setFormData({ nome: "", telefone: "", dataNascimento: "", setor: "", dataOcorrencia: "", descricao: "" });
@@ -204,9 +214,9 @@ export default function PublicPatientOccurrence() {
                         <Button
                             type="submit"
                             className="w-full text-lg py-6"
-                            disabled={isPending || isSubmitting || uploadAttachments.isPending}
+                            disabled={isPending || isSubmitting}
                         >
-                            {isSubmitting || uploadAttachments.isPending
+                            {isSubmitting
                                 ? "Enviando..."
                                 : isPending
                                     ? "Processando..."

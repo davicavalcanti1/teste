@@ -70,6 +70,45 @@ export function useAttachmentsWithSignedUrls(occurrenceId: string | undefined) {
   });
 }
 
+// Helper to just upload files and return the attachment objects
+export async function uploadFilesToStorage(
+  files: File[],
+  occurrenceId: string, // We can use a temp ID or the real one
+  userId: string
+): Promise<Attachment[]> {
+  const uploadedAttachments: Attachment[] = [];
+
+  for (const file of files) {
+    const isImage = isImageMimeType(file.type);
+    const fileName = `${Date.now()}-${file.name}`;
+    const filePath = `${occurrenceId}/${fileName}`;
+
+    // Upload to storage
+    const { error: uploadError } = await supabase.storage
+      .from("occurrence-attachments")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      throw new Error(`Erro ao fazer upload de ${file.name}: ${uploadError.message}`);
+    }
+
+    const newAttachment: Attachment = {
+      file_name: file.name,
+      file_type: file.type,
+      file_size: file.size,
+      file_url: filePath,
+      is_image: isImage,
+      uploaded_by: userId,
+      uploaded_em: new Date().toISOString()
+    };
+
+    uploadedAttachments.push(newAttachment);
+  }
+
+  return uploadedAttachments;
+}
+
 // Upload attachments for an occurrence
 export function useUploadAttachments() {
   const queryClient = useQueryClient();
@@ -87,35 +126,8 @@ export function useUploadAttachments() {
       userId: string;
       tableName?: string;
     }) => {
-      const uploadedAttachments: Attachment[] = [];
 
-      for (const file of files) {
-        const isImage = isImageMimeType(file.type);
-        const fileName = `${Date.now()}-${file.name}`;
-        const filePath = `${occurrenceId}/${fileName}`;
-
-        // Upload to storage
-        const { error: uploadError } = await supabase.storage
-          .from("occurrence-attachments")
-          .upload(filePath, file);
-
-        if (uploadError) {
-          console.error("Upload error:", uploadError);
-          throw new Error(`Erro ao fazer upload de ${file.name}: ${uploadError.message}`);
-        }
-
-        const newAttachment: Attachment = {
-          file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
-          file_url: filePath,
-          is_image: isImage,
-          uploaded_by: userId,
-          uploaded_em: new Date().toISOString()
-        };
-
-        uploadedAttachments.push(newAttachment);
-      }
+      const uploadedAttachments = await uploadFilesToStorage(files, occurrenceId, userId);
 
       // Update JSONB column 'anexos'
       // fetch current
