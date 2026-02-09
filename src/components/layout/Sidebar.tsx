@@ -12,7 +12,8 @@ import {
     SlidersHorizontal,
     BookOpen,
     CheckCircle2,
-    MoreVertical
+    MoreVertical,
+    ClipboardList
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -42,10 +43,8 @@ export function Sidebar() {
     const navLinks = [
         { href: "/", label: "Início", icon: Home, adminOnly: false },
         { href: "/ocorrencias", label: "Ocorrências", icon: FileText, adminOnly: false },
-        { href: "/kanbans", label: "Kanbans", icon: Columns3, adminOnly: false },
         { href: "/inspecoes", label: "Inspeções", icon: CheckCircle2, adminOnly: false },
-        { href: "/analise", label: "Análise", icon: SlidersHorizontal, adminOnly: true },
-        { href: "/relatorios", label: "Dashboard", icon: BarChart3, adminOnly: false },
+        { href: "/analise", label: "Anamnese", icon: ClipboardList, adminOnly: true },
         { href: "/livro", label: "Livro", icon: BookOpen, adminOnly: false },
     ].filter(link => {
         if (link.adminOnly && !isAdmin) return false;
