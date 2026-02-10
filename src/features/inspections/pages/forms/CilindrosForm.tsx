@@ -15,26 +15,39 @@ import { Loader2, CheckCircle2, UploadCloud, CheckCircle, Camera } from "lucide-
 import { toast } from "sonner";
 import { PublicFormLayout } from "@/layouts/PublicFormLayout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { formatarMensagemInspecao } from "../../utils/cylinderMessageFormatter";
 
 // --- Schema ---
 const cylinderSchema = z.object({
     funcionario: z.string().min(3, "Nome do funcionário é obrigatório (min 3 letras)"),
     data_referencia: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida"),
 
-    precisa_oxigenio: z.boolean().default(false),
-    qtd_oxigenio: z.string().optional(), // We'll parse to number manually or refine schema
+    // Oxigênio Grande (Anterior "Oxigênio")
+    precisa_oxigenio_grande: z.boolean().default(false),
+    qtd_oxigenio_grande: z.string().optional(),
 
+    // Oxigênio Pequeno (Novo)
+    precisa_oxigenio_pequeno: z.boolean().default(false),
+    qtd_oxigenio_pequeno: z.string().optional(),
+
+    // Ar Comprimido (Mantido)
     precisa_ar: z.boolean().default(false),
     qtd_ar: z.string().optional(),
 
     observacoes: z.string().optional(),
 })
     .refine((data) => {
-        if (data.precisa_oxigenio && (!data.qtd_oxigenio || parseInt(data.qtd_oxigenio) <= 0)) {
+        if (data.precisa_oxigenio_grande && (!data.qtd_oxigenio_grande || parseInt(data.qtd_oxigenio_grande) <= 0)) {
             return false;
         }
         return true;
-    }, { message: "Informe a quantidade de Oxigênio", path: ["qtd_oxigenio"] })
+    }, { message: "Informe a quantidade de Oxigênio Grande", path: ["qtd_oxigenio_grande"] })
+    .refine((data) => {
+        if (data.precisa_oxigenio_pequeno && (!data.qtd_oxigenio_pequeno || parseInt(data.qtd_oxigenio_pequeno) <= 0)) {
+            return false;
+        }
+        return true;
+    }, { message: "Informe a quantidade de Oxigênio Pequeno", path: ["qtd_oxigenio_pequeno"] })
     .refine((data) => {
         if (data.precisa_ar && (!data.qtd_ar || parseInt(data.qtd_ar) <= 0)) {
             return false;
@@ -63,15 +76,18 @@ export default function CilindrosForm() {
         defaultValues: {
             funcionario: "",
             data_referencia: initialDate,
-            precisa_oxigenio: false, // Default nao
-            qtd_oxigenio: "",
-            precisa_ar: false, // Default nao
+            precisa_oxigenio_grande: false,
+            qtd_oxigenio_grande: "",
+            precisa_oxigenio_pequeno: false,
+            qtd_oxigenio_pequeno: "",
+            precisa_ar: false,
             qtd_ar: "",
             observacoes: ""
         }
     });
 
-    const precisaOxigenio = form.watch("precisa_oxigenio");
+    const precisaOxigenioGrande = form.watch("precisa_oxigenio_grande");
+    const precisaOxigenioPequeno = form.watch("precisa_oxigenio_pequeno");
     const precisaAr = form.watch("precisa_ar");
 
     // --- Actions ---
@@ -122,10 +138,16 @@ export default function CilindrosForm() {
             const payload = {
                 funcionario: values.funcionario,
                 data_referencia: values.data_referencia,
-                precisa_oxigenio: values.precisa_oxigenio,
-                qtd_oxigenio: values.precisa_oxigenio ? parseInt(values.qtd_oxigenio || "0") : null,
+
+                // Novos campos
+                precisa_oxigenio_grande: values.precisa_oxigenio_grande,
+                qtd_oxigenio_grande: values.precisa_oxigenio_grande ? parseInt(values.qtd_oxigenio_grande || "0") : null,
+                precisa_oxigenio_pequeno: values.precisa_oxigenio_pequeno,
+                qtd_oxigenio_pequeno: values.precisa_oxigenio_pequeno ? parseInt(values.qtd_oxigenio_pequeno || "0") : null,
+
                 precisa_ar: values.precisa_ar,
                 qtd_ar: values.precisa_ar ? parseInt(values.qtd_ar || "0") : null,
+
                 observacoes: values.observacoes,
                 fotos_urls: uploadedUrls,
             };
@@ -139,31 +161,112 @@ export default function CilindrosForm() {
 
             if (error) throw error;
 
-            // 4. Webhook Trigger (Validation/Notification)
+            console.log('Inspeção salva:', data.protocolo);
+
+            // --- ETAPA 3: LÓGICA DE DETECÇÃO E TOKEN ---
+
+            // 3.1 Detectar se há pedido
+            const temPedido = (
+                (data.qtd_oxigenio_grande && data.qtd_oxigenio_grande > 0) ||
+                (data.qtd_oxigenio_pequeno && data.qtd_oxigenio_pequeno > 0) ||
+                (data.qtd_ar && data.qtd_ar > 0)
+            );
+
+            console.log('Requer confirmação:', temPedido);
+
+            let token = null;
+            let confirmationUrl = null;
+
+            // 3.2 Se houver pedido, gerar token
+            if (temPedido) {
+                try {
+                    token = crypto.randomUUID();
+                    const expiresAt = new Date();
+                    expiresAt.setHours(expiresAt.getHours() + 48); // 48 horas
+
+                    console.log('Token gerado:', token);
+                    console.log('Expira em:', expiresAt);
+
+                    // Atualizar registro com token
+                    const { error: updateError } = await (supabase as any)
+                        .from('inspecoes_cilindros')
+                        .update({
+                            confirmation_token: token,
+                            confirmation_token_expires_at: expiresAt.toISOString()
+                        })
+                        .eq('id', data.id);
+
+                    if (updateError) {
+                        console.error('Erro ao salvar token:', updateError);
+                    } else {
+                        // URL de confirmação (apenas se salvou token com sucesso)
+                        confirmationUrl = `https://ocorrencias.imagoradiologia.cloud/inspecoes/cilindros/confirmar/${token}`;
+                    }
+
+                } catch (tokenError) {
+                    console.error('Erro no processo de confirmação:', tokenError);
+                }
+            }
+
+            // 3.3 Montar Payload Webhook
+            const cilindrosPedido = {
+                oxigenio_grande: data.qtd_oxigenio_grande || 0,
+                oxigenio_pequeno: data.qtd_oxigenio_pequeno || 0,
+                ar_comprimido: data.qtd_ar || 0
+            };
+
+            const webhookPayload = {
+                ...data,
+                requer_confirmacao: temPedido,
+                confirmation_url: confirmationUrl,
+                cilindros_pedido: cilindrosPedido,
+                destinatario_gestora: "558388263800",
+                nome_gestora: "Lidiane"
+            };
+
+            // --- ETAPA 5: FORMATAÇÃO DE MENSAGEM ---
+            const mensagens = formatarMensagemInspecao(webhookPayload);
+
+            let finalPayload;
+
+            if (temPedido) {
+                // COM PEDIDO
+                finalPayload = {
+                    ...webhookPayload,
+                    formatted_message_gestora: (mensagens as any).mensagem_gestora,
+                    formatted_message_grupo: (mensagens as any).mensagem_grupo,
+                    group_jid: "120363025674048776@g.us",
+                    tipo_envio: "pedido_confirmacao"
+                };
+            } else {
+                // SEM PEDIDO
+                finalPayload = {
+                    ...webhookPayload,
+                    formatted_message: mensagens, // string única
+                    group_jid: "120363025674048776@g.us",
+                    tipo_envio: "inspecao_normal"
+                };
+            }
+
+            // 3.4 Enviar para Webhook
             try {
                 const webhookUrl = "https://n8n.imagoradiologia.cloud/webhook/cilindro";
 
-                // Constructing message per requirement to display or logs
-                const msg = `📋 INSPEÇÃO CILINDROS\nProtocolo: ${data.protocolo}\nData: ${data.data_referencia}\nFuncionário: ${data.funcionario}\nOxigênio: ${data.precisa_oxigenio ? 'SIM' : 'NÃO'} | Qt: ${data.qtd_oxigenio || '-'}\nAr comprimido: ${data.precisa_ar ? 'SIM' : 'NÃO'} | Qt: ${data.qtd_ar || '-'}\nObs: ${data.observacoes || '-'}`;
-                console.log("Mensagem gerada:", msg);
-
-                // Send to N8N
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...data,
-                        formatted_message: msg
-                    })
+                    body: JSON.stringify(finalPayload)
                 });
 
                 if (!response.ok) {
-                    throw new Error(`N8N respondeu com erro: ${response.status}`);
+                    console.error('Erro ao enviar webhook:', await response.text());
+                } else {
+                    console.log('Webhook enviado com sucesso!');
                 }
 
             } catch (webhookError: any) {
                 console.error("Webhook falhou:", webhookError);
-                toast.warning("Registro salvo, mas houve falha na notificação automática. " + webhookError.message);
+                // Não exibir toast de erro aqui para não assustar usuário se o banco já salvou
             }
 
             setSuccessData(data);
@@ -245,14 +348,14 @@ export default function CilindrosForm() {
 
                         <div className="h-px bg-gray-100 my-4" />
 
-                        {/* Section: Oxigênio */}
+                        {/* Section: Oxigênio Grande */}
                         <div className="space-y-4">
                             <FormField
                                 control={form.control}
-                                name="precisa_oxigenio"
+                                name="precisa_oxigenio_grande"
                                 render={({ field }) => (
                                     <FormItem className="space-y-3">
-                                        <FormLabel className="text-base font-semibold text-gray-700">Há necessidade de repor Oxigênio?</FormLabel>
+                                        <FormLabel className="text-base font-semibold text-gray-700">Há necessidade de repor Oxigênio Grande?</FormLabel>
                                         <FormControl>
                                             <RadioGroup
                                                 onValueChange={(val) => field.onChange(val === "sim")}
@@ -263,17 +366,13 @@ export default function CilindrosForm() {
                                                     <FormControl>
                                                         <RadioGroupItem value="sim" />
                                                     </FormControl>
-                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">
-                                                        Sim
-                                                    </FormLabel>
+                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">Sim</FormLabel>
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-2 space-y-0 border rounded-lg p-3 w-1/2 justify-center cursor-pointer hover:bg-gray-50 bg-white">
                                                     <FormControl>
                                                         <RadioGroupItem value="nao" />
                                                     </FormControl>
-                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">
-                                                        Não
-                                                    </FormLabel>
+                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">Não</FormLabel>
                                                 </FormItem>
                                             </RadioGroup>
                                         </FormControl>
@@ -282,15 +381,65 @@ export default function CilindrosForm() {
                                 )}
                             />
 
-                            {precisaOxigenio && (
+                            {precisaOxigenioGrande && (
                                 <FormField
                                     control={form.control}
-                                    name="qtd_oxigenio"
+                                    name="qtd_oxigenio_grande"
                                     render={({ field }) => (
                                         <FormItem className="animate-in fade-in zoom-in-95 duration-200 bg-purple-50 p-4 rounded-lg border border-purple-100">
-                                            <FormLabel className="text-purple-800 font-medium">Quantos Cilindros de Oxigênio?</FormLabel>
+                                            <FormLabel className="text-purple-800 font-medium">Quantos Cilindros Grandes?</FormLabel>
                                             <FormControl>
                                                 <Input type="number" placeholder="Digite a quantidade..." {...field} className="bg-white border-purple-200 focus-visible:ring-purple-500 h-12 text-lg" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+                        </div>
+
+                        {/* Section: Oxigênio Pequeno (NOVO) */}
+                        <div className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="precisa_oxigenio_pequeno"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel className="text-base font-semibold text-gray-700">Há necessidade de repor Oxigênio Pequeno?</FormLabel>
+                                        <FormControl>
+                                            <RadioGroup
+                                                onValueChange={(val) => field.onChange(val === "sim")}
+                                                defaultValue={field.value ? "sim" : "nao"}
+                                                className="flex space-x-4"
+                                            >
+                                                <FormItem className="flex items-center space-x-2 space-y-0 border rounded-lg p-3 w-1/2 justify-center cursor-pointer hover:bg-gray-50 bg-white">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="sim" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">Sim</FormLabel>
+                                                </FormItem>
+                                                <FormItem className="flex items-center space-x-2 space-y-0 border rounded-lg p-3 w-1/2 justify-center cursor-pointer hover:bg-gray-50 bg-white">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="nao" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">Não</FormLabel>
+                                                </FormItem>
+                                            </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {precisaOxigenioPequeno && (
+                                <FormField
+                                    control={form.control}
+                                    name="qtd_oxigenio_pequeno"
+                                    render={({ field }) => (
+                                        <FormItem className="animate-in fade-in zoom-in-95 duration-200 bg-purple-50 p-4 rounded-lg border border-purple-100">
+                                            <FormLabel className="text-purple-800 font-medium">Quantos Cilindros Pequenos?</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="Quantidade de cilindros pequenos" {...field} className="bg-white border-purple-200 focus-visible:ring-purple-500 h-12 text-lg" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -319,17 +468,13 @@ export default function CilindrosForm() {
                                                     <FormControl>
                                                         <RadioGroupItem value="sim" />
                                                     </FormControl>
-                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">
-                                                        Sim
-                                                    </FormLabel>
+                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">Sim</FormLabel>
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-2 space-y-0 border rounded-lg p-3 w-1/2 justify-center cursor-pointer hover:bg-gray-50 bg-white">
                                                     <FormControl>
                                                         <RadioGroupItem value="nao" />
                                                     </FormControl>
-                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">
-                                                        Não
-                                                    </FormLabel>
+                                                    <FormLabel className="font-normal cursor-pointer text-gray-700">Não</FormLabel>
                                                 </FormItem>
                                             </RadioGroup>
                                         </FormControl>

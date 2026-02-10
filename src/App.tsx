@@ -48,6 +48,7 @@ import BanheiroClose from "./features/inspections/pages/forms/banheiro/BanheiroC
 import BanheiroRalo from "./features/inspections/pages/forms/banheiro/BanheiroRalo";
 import ACForm from "./features/inspections/pages/forms/ac/ACForm";
 import CilindrosForm from "./features/inspections/pages/forms/CilindrosForm";
+import CilindroConfirmacao from "./features/inspections/pages/CilindroConfirmacao";
 
 
 
@@ -223,6 +224,7 @@ const App = () => (
 
             {/* Cylinder New Form */}
             <Route path="/inspecoes/cilindros" element={<CilindrosForm />} />
+            <Route path="/inspecoes/cilindros/confirmar/:token" element={<CilindroConfirmacao />} />
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
