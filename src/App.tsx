@@ -68,6 +68,10 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/paciente" element={<PublicPatientOccurrence />} />
 
+            {/* Cylinder Confirmation - Public Route (Moved to top for priority) */}
+            <Route path="/inspecoes/cilindros/confirmar/:token" element={<CilindroConfirmacao />} />
+
+
             {/* Protected routes - all users */}
             <Route path="/" element={
               <ProtectedRoute allowedRoles={['admin', 'user', 'rh', 'enfermagem']}>
@@ -224,10 +228,9 @@ const App = () => (
 
             {/* Cylinder New Form */}
             <Route path="/inspecoes/cilindros" element={<CilindrosForm />} />
-            <Route path="/inspecoes/cilindros/confirmar/:token" element={<CilindroConfirmacao />} />
-
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
+
           </Routes>
         </AuthProvider>
       </BrowserRouter>
