@@ -68,7 +68,8 @@ export default function CilindroConfirmacao() {
                 }
 
                 // If using token, check expiration
-                if (!isUuid && data.confirmation_token_expires_at) {
+                // Check expiration if it exists
+                if (data.confirmation_token_expires_at) {
                     const agora = new Date();
                     const expiracao = new Date(data.confirmation_token_expires_at);
 
