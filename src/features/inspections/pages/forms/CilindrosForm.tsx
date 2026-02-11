@@ -200,7 +200,8 @@ export default function CilindrosForm() {
                         console.error('Erro ao salvar token:', updateError);
                     } else {
                         // URL de confirmação (apenas se salvou token com sucesso)
-                        confirmationUrl = `https://ocorrencias.imagoradiologia.cloud/inspecoes/cilindros/confirmar/${token}`;
+                        // URL de confirmação (dinâmica baseada na origem atual)
+                        confirmationUrl = `${window.location.origin}/inspecoes/cilindros/confirmar/${token}`;
                     }
 
                 } catch (tokenError) {
