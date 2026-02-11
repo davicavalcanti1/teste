@@ -36,23 +36,40 @@ export default function CilindroConfirmacao() {
     useEffect(() => {
         async function validarToken() {
             if (!token) {
-                setErro("Token não fornecido");
+                setErro("Link inválido");
                 setLoading(false);
                 return;
             }
 
             try {
                 setLoading(true);
+                let data, error;
 
-                // Buscar inspeção pelo token
-                const { data, error } = await (supabase as any)
-                    .from('inspecoes_cilindros')
-                    .select('*')
-                    .eq('confirmation_token', token)
-                    .single();
+                // Check if token is a UUID (assuming ID) or a specialized token
+                const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token);
+
+                if (isUuid) {
+                    // Try finding by ID
+                    const response = await (supabase as any)
+                        .from('inspecoes_cilindros')
+                        .select('*')
+                        .eq('id', token)
+                        .single();
+                    data = response.data;
+                    error = response.error;
+                } else {
+                    // Try finding by Token
+                    const response = await (supabase as any)
+                        .from('inspecoes_cilindros')
+                        .select('*')
+                        .eq('confirmation_token', token)
+                        .single();
+                    data = response.data;
+                    error = response.error;
+                }
 
                 if (error || !data) {
-                    setErro('Link inválido ou não encontrado.');
+                    setErro('Pedido não encontrado ou link inválido.');
                     return;
                 }
 
@@ -62,20 +79,22 @@ export default function CilindroConfirmacao() {
                     return;
                 }
 
-                // Verificar se expirou
-                const agora = new Date();
-                const expiracao = new Date(data.confirmation_token_expires_at);
+                // If using token, check expiration
+                if (!isUuid && data.confirmation_token_expires_at) {
+                    const agora = new Date();
+                    const expiracao = new Date(data.confirmation_token_expires_at);
 
-                if (agora > expiracao) {
-                    setErro('Este link de confirmação expirou');
-                    return;
+                    if (agora > expiracao) {
+                        setErro('Este link de confirmação expirou');
+                        return;
+                    }
                 }
 
-                // Token válido
+                // Válido
                 setInspecao(data);
 
             } catch (error) {
-                console.error('Erro ao validar token:', error);
+                console.error('Erro ao validar:', error);
                 setErro('Erro ao processar solicitação');
             } finally {
                 setLoading(false);
