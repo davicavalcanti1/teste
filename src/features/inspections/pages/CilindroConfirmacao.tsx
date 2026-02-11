@@ -46,27 +46,15 @@ export default function CilindroConfirmacao() {
                 let data, error;
 
                 // Check if token is a UUID (assuming ID) or a specialized token
-                const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token);
+                // Prioritize finding by confirmation_token, but also allow finding by ID
+                const response = await (supabase as any)
+                    .from('inspecoes_cilindros')
+                    .select('*')
+                    .or(`confirmation_token.eq.${token},id.eq.${token}`)
+                    .single();
 
-                if (isUuid) {
-                    // Try finding by ID
-                    const response = await (supabase as any)
-                        .from('inspecoes_cilindros')
-                        .select('*')
-                        .eq('id', token)
-                        .single();
-                    data = response.data;
-                    error = response.error;
-                } else {
-                    // Try finding by Token
-                    const response = await (supabase as any)
-                        .from('inspecoes_cilindros')
-                        .select('*')
-                        .eq('confirmation_token', token)
-                        .single();
-                    data = response.data;
-                    error = response.error;
-                }
+                data = response.data;
+                error = response.error;
 
                 if (error || !data) {
                     setErro('Pedido não encontrado ou link inválido.');
