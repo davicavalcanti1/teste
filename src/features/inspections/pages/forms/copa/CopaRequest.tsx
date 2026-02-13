@@ -33,12 +33,18 @@ export default function CopaRequest() {
         setIsSubmitting(true);
         try {
             const currentUrl = window.location.href;
-            const gpMessage = `⚠️ *Solicitação:* O item ${item} precisa de abastecimento em ${locationParam}!`;
 
             // Generate Protocol
             const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
             const randomPart = Math.floor(1000 + Math.random() * 9000);
             const protocol = `COPA-${today}-${randomPart}`;
+
+            const gpMessage = `⚠️ *SOLICITAÇÃO DE ABASTECIMENTO*
+*Protocolo:* ${protocol}
+*Item:* ${item}
+*Local:* ${locationParam}
+
+Clique para finalizar quando realizar o abastecimento.`;
 
             // 1. Insert into Supabase
             const { error: dbError } = await supabase.from("inspections_copa" as any).insert({
@@ -64,7 +70,7 @@ export default function CopaRequest() {
                 })
             });
 
-            setSuccessMessage(`Solicitação de ${item} enviada com sucesso!`);
+            setSuccessMessage(`Solicitação de ${item} em ${locationParam} enviada com sucesso! Protocolo: ${protocol}`);
             setIsSuccess(true);
         } catch (error: any) {
             console.error(error);
