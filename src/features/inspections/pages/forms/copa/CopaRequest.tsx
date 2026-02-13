@@ -16,8 +16,12 @@ export default function CopaRequest() {
 
     // Read URL params
     const action = searchParams.get("action");
-    const showWater = searchParams.get("water") === "true";
-    const showCoffee = searchParams.get("coffee") === "true";
+    const waterParam = searchParams.get("water");
+    const coffeeParam = searchParams.get("coffee");
+
+    // If no param is provided, show both by default
+    const showWater = waterParam === "true" || (!waterParam && !coffeeParam);
+    const showCoffee = coffeeParam === "true" || (!waterParam && !coffeeParam);
     const locationParam = searchParams.get("localizacao") || "Copa";
 
     // Finalize Mode State
