@@ -159,7 +159,7 @@ export default function Relatorios() {
         )}
 
         {/* REVISÃO DE EXAME DASHBOARD */}
-        {(dashboardView === 'revisao' || role !== 'admin') && (
+        {dashboardView === 'revisao' && (role === 'admin' || role === 'user') && (
           <section className="space-y-6 mb-6 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300">
             {/* KPI Cards */}
             <div className="rounded-xl border border-border bg-card p-6">
@@ -228,7 +228,7 @@ export default function Relatorios() {
         )}
 
         {/* ENFERMAGEM DASHBOARD */}
-        {(role === 'admin' || role === 'user' || role === 'enfermagem') && dashboardView === 'enfermagem' && (
+        {dashboardView === 'enfermagem' && (role === 'admin' || role === 'enfermagem') && (
           <section className="rounded-xl border border-emerald-100 bg-emerald-50/30 p-6 mb-6 animate-in fade-in slide-in-from-bottom-12 duration-700 delay-300">
             <h3 className="text-sm font-medium text-emerald-800 uppercase tracking-wide mb-4">
               Indicadores de Enfermagem

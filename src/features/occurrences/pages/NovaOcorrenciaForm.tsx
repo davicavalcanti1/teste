@@ -235,8 +235,14 @@ export default function NovaOcorrenciaForm() {
           // medico_destino: ... 
         });
       } else {
+        // Map frontend types to backend enum types
+        let backendType = data.tipo;
+        if (data.tipo === 'revisao_exame') {
+          backendType = 'assistencial'; // Mapping revisao_exame to assistencial
+        }
+
         occurrence = await createOccurrence.mutateAsync({
-          tipo: data.tipo,
+          tipo: backendType,
           subtipo: data.subtipo,
           paciente_nome_completo: data.paciente.nomeCompleto,
           paciente_telefone: data.paciente.telefone,

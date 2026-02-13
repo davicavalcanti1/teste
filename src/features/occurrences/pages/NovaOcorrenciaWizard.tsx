@@ -26,6 +26,7 @@ import {
   subtypeDescriptions,
   subtypesByType,
 } from "@/features/occurrences/types/occurrence";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Type configurations - now includes revisao_exame as standalone type
 const typeConfig: Record<OccurrenceType, {
@@ -80,7 +81,7 @@ const typeConfig: Record<OccurrenceType, {
     title: "Ocorrência de Paciente",
     description: "Registro público de paciente",
     icon: User,
-    color: "text-gray-600", // Keep patient as gray/neutral to differentiate slightly or make it primary too?
+    color: "text-gray-600",
     bgColor: "bg-gray-50",
     borderColor: "border-gray-200",
     hoverColor: "hover:border-gray-400",
@@ -113,9 +114,37 @@ const subtypeIcons: Record<OccurrenceSubtype, typeof Heart> = {
 
 export default function NovaOcorrenciaWizard() {
   const navigate = useNavigate();
+  const { role } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedType, setSelectedType] = useState<OccurrenceType | null>(null);
   const [selectedSubtype, setSelectedSubtype] = useState<OccurrenceSubtype | null>(null);
+
+  // Filter types based on role
+  const getVisibleTypes = (): OccurrenceType[] => {
+    if (!role) return [];
+
+    // Admin sees everything
+    if (role === 'admin') return typeOrder;
+
+    // RH sees Livre and Administrative
+    if (role === 'rh') {
+      return typeOrder.filter(t => ['livre', 'administrativa'].includes(t));
+    }
+
+    // Nursing sees Livre and Nursing
+    if (role === 'enfermagem') {
+      return typeOrder.filter(t => ['livre', 'enfermagem'].includes(t));
+    }
+
+    // Standard User sees only Review Exam
+    if (role === 'user') {
+      return typeOrder.filter(t => ['revisao_exame'].includes(t));
+    }
+
+    return [];
+  };
+
+  const visibleTypes = getVisibleTypes();
 
   const handleTypeSelect = (type: OccurrenceType) => {
     // For revisao_exame, go directly to form (no subtype selection needed)
@@ -162,7 +191,6 @@ export default function NovaOcorrenciaWizard() {
   return (
     <MainLayout>
       <div className="mx-auto max-w-3xl animate-fade-in">
-        {/* Back Button */}
         {/* Back Button - Only show on step 2 */}
         {step > 1 && (
           <Button
@@ -212,7 +240,7 @@ export default function NovaOcorrenciaWizard() {
             </div>
 
             <div className="space-y-4">
-              {typeOrder.map((type) => {
+              {visibleTypes.map((type) => {
                 const config = typeConfig[type];
                 const Icon = config.icon;
                 const isDisabled = config.disabled;

@@ -14,6 +14,7 @@ import {
   Loader2,
 } from "lucide-react";
 
+import { useAuth } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,6 +72,7 @@ interface Filters {
 
 export default function Analise() {
   const navigate = useNavigate();
+  const { role } = useAuth();
   const { data: occurrences = [], isLoading } = useOccurrences();
 
   const [filters, setFilters] = useState<Filters>({
@@ -109,6 +111,17 @@ export default function Analise() {
   ).length;
 
   const filteredOccurrences = occurrences.filter((occ) => {
+    // Role Restriction
+    let roleMatch = true;
+    if (role === 'rh') {
+      roleMatch = occ.tipo === 'administrativa';
+    } else if (role === 'enfermagem') {
+      roleMatch = occ.tipo === 'enfermagem';
+    } else if (role === 'user') {
+      // Check for revisao_exame in subtype or type (legacy)
+      roleMatch = occ.subtipo === 'revisao_exame' || occ.tipo === 'revisao_exame';
+    }
+
     const matchesSearch =
       !filters.search ||
       occ.protocolo?.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -130,6 +143,7 @@ export default function Analise() {
       filters.usuario === "all" || occ.criador_nome === filters.usuario;
 
     return (
+      roleMatch &&
       matchesSearch &&
       matchesDateFrom &&
       matchesDateTo &&
@@ -382,9 +396,8 @@ export default function Analise() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
-                          statusConfig[occ.status as OccurrenceStatus].bgColor
-                        } ${statusConfig[occ.status as OccurrenceStatus].color}`}
+                        className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${statusConfig[occ.status as OccurrenceStatus].bgColor
+                          } ${statusConfig[occ.status as OccurrenceStatus].color}`}
                       >
                         {statusConfig[occ.status as OccurrenceStatus].label}
                       </span>

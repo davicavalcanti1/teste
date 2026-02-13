@@ -43,7 +43,7 @@ export function Sidebar() {
     const navLinks = [
         { href: "/", label: "Início", icon: Home, adminOnly: false },
         { href: "/ocorrencias", label: "Ocorrências", icon: FileText, adminOnly: false },
-        { href: "/inspecoes", label: "Inspeções", icon: CheckCircle2, adminOnly: false },
+        { href: "/inspecoes", label: "Inspeções", icon: CheckCircle2, adminOnly: true },
         { href: "/analise", label: "Anamnese", icon: ClipboardList, adminOnly: true },
         { href: "/livro", label: "Livro", icon: BookOpen, adminOnly: false },
         { href: "/funcionarios", label: "Funcionários", icon: User, allowedRoles: ['admin', 'rh'] },
