@@ -18,10 +18,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 const deaSchema = z.object({
     funcionario: z.string().min(3, "Nome do funcionário é obrigatório (min 3 letras)"),
     localizacao: z.string().min(3, "Localização é obrigatória"),
-    bateria_porcentagem: z.string().refine((val) => {
-        const num = parseInt(val);
-        return !isNaN(num) && num >= 0 && num <= 100;
-    }, "Porcentagem deve ser entre 0 e 100"),
+    bateria_nivel: z.enum(["baixa", "media", "cheia"], {
+        required_error: "Selecione o nível da bateria",
+    }),
     observacoes: z.string().optional(),
 });
 
@@ -38,7 +37,7 @@ export default function DEAForm() {
         defaultValues: {
             funcionario: "",
             localizacao: "",
-            bateria_porcentagem: "",
+            bateria_nivel: "cheia",
             observacoes: ""
         }
     });
@@ -89,7 +88,8 @@ export default function DEAForm() {
             const payload = {
                 funcionario: values.funcionario,
                 localizacao: values.localizacao,
-                bateria_porcentagem: parseInt(values.bateria_porcentagem),
+                bateria_porcentagem: values.bateria_nivel === 'cheia' ? 100 : values.bateria_nivel === 'media' ? 50 : 10,
+                status_bateria: values.bateria_nivel, // Adicionando o nível textual se possível/necessário
                 observacoes: values.observacoes,
                 fotos_urls: uploadedUrls,
                 data_referencia: format(new Date(), "yyyy-MM-dd"),
@@ -117,7 +117,7 @@ export default function DEAForm() {
                     `📅 *Data:* ${format(new Date(data.criado_em), 'dd/MM/yyyy HH:mm')}\n` +
                     `👤 *Responsável:* ${data.funcionario}\n` +
                     `📍 *Local:* ${data.localizacao}\n` +
-                    `🔋 *Bateria:* ${data.bateria_porcentagem}%\n\n` +
+                    `🔋 *Bateria:* ${values.bateria_nivel.toUpperCase()}\n\n` +
                     (data.observacoes ? `📝 *Obs:* ${data.observacoes}\n\n` : '') +
                     `🔗 *Visualizar:* ${viewLink}`
             };
@@ -210,25 +210,53 @@ export default function DEAForm() {
                             )}
                         />
 
+                        {/* Data (Exibição apenas) */}
+                        <div className="space-y-2">
+                            <FormLabel className="text-gray-700">Data da Inspeção</FormLabel>
+                            <div className="h-12 border rounded-md px-3 flex items-center bg-gray-50 text-gray-600 font-medium">
+                                {format(new Date(), "dd/MM/yyyy")}
+                            </div>
+                        </div>
+
                         <div className="h-px bg-gray-100 my-4" />
 
-                        {/* Bateria */}
+                        {/* Nível da Bateria */}
                         <FormField
                             control={form.control}
-                            name="bateria_porcentagem"
+                            name="bateria_nivel"
                             render={({ field }) => (
                                 <FormItem className="bg-rose-50 p-4 rounded-lg border border-rose-100">
-                                    <FormLabel className="flex items-center gap-2 text-rose-800 font-medium text-lg">
+                                    <FormLabel className="flex items-center gap-2 text-rose-800 font-medium text-lg mb-3">
                                         <Battery className="h-5 w-5" />
-                                        Porcentagem da Bateria (%) <span className="text-red-500">*</span>
+                                        Nível da Bateria <span className="text-red-500">*</span>
                                     </FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            placeholder="0 - 100"
-                                            {...field}
-                                            className="bg-white border-rose-200 focus-visible:ring-rose-500 h-14 text-2xl font-bold text-center"
-                                        />
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <Button
+                                                type="button"
+                                                variant={field.value === "baixa" ? "default" : "outline"}
+                                                className={`h-14 font-bold border-2 ${field.value === "baixa" ? "bg-red-600 hover:bg-red-700 border-red-600" : "bg-white border-red-200 text-red-600 hover:bg-red-50"}`}
+                                                onClick={() => field.onChange("baixa")}
+                                            >
+                                                BAIXA
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={field.value === "media" ? "default" : "outline"}
+                                                className={`h-14 font-bold border-2 ${field.value === "media" ? "bg-yellow-500 hover:bg-yellow-600 border-yellow-500" : "bg-white border-yellow-200 text-yellow-600 hover:bg-yellow-50"}`}
+                                                onClick={() => field.onChange("media")}
+                                            >
+                                                MÉDIA
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={field.value === "cheia" ? "default" : "outline"}
+                                                className={`h-14 font-bold border-2 ${field.value === "cheia" ? "bg-green-600 hover:bg-green-700 border-green-600" : "bg-white border-green-200 text-green-600 hover:bg-green-50"}`}
+                                                onClick={() => field.onChange("cheia")}
+                                            >
+                                                CHEIA
+                                            </Button>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
