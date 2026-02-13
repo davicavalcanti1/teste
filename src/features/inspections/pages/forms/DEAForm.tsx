@@ -21,6 +21,9 @@ const deaSchema = z.object({
     bateria_nivel: z.enum(["baixa", "media", "cheia"], {
         required_error: "Selecione o nível da bateria",
     }),
+    colocou_carregar: z.enum(["sim", "nao"], {
+        required_error: "Informe se colocou para carregar",
+    }),
     observacoes: z.string().optional(),
 });
 
@@ -38,6 +41,7 @@ export default function DEAForm() {
             funcionario: "",
             localizacao: "",
             bateria_nivel: "cheia",
+            colocou_carregar: "nao",
             observacoes: ""
         }
     });
@@ -89,7 +93,7 @@ export default function DEAForm() {
                 funcionario: values.funcionario,
                 localizacao: values.localizacao,
                 bateria_porcentagem: values.bateria_nivel === 'cheia' ? 100 : values.bateria_nivel === 'media' ? 50 : 10,
-                observacoes: values.observacoes,
+                observacoes: (values.colocou_carregar === 'sim' ? "[CARREGANDO: SIM] " : "[CARREGANDO: NÃO] ") + (values.observacoes || ""),
                 fotos_urls: uploadedUrls,
                 data_referencia: format(new Date(), "yyyy-MM-dd"),
                 status: 'finalizado' // Direct finalization
@@ -116,8 +120,9 @@ export default function DEAForm() {
                     `📅 *Data:* ${format(new Date(data.criado_em), 'dd/MM/yyyy HH:mm')}\n` +
                     `👤 *Responsável:* ${data.funcionario}\n` +
                     `📍 *Local:* ${data.localizacao}\n` +
-                    `🔋 *Bateria:* ${values.bateria_nivel.toUpperCase()}\n\n` +
-                    (data.observacoes ? `📝 *Obs:* ${data.observacoes}\n\n` : '') +
+                    `🔋 *Bateria:* ${values.bateria_nivel.toUpperCase()}\n` +
+                    `🔌 *Carregando:* ${values.colocou_carregar === 'sim' ? 'SIM' : 'NÃO'}\n\n` +
+                    (values.observacoes ? `📝 *Obs:* ${values.observacoes}\n\n` : '') +
                     `🔗 *Visualizar:* ${viewLink}`
             };
 
@@ -254,6 +259,40 @@ export default function DEAForm() {
                                                 onClick={() => field.onChange("cheia")}
                                             >
                                                 CHEIA
+                                            </Button>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Colocou para carregar? */}
+                        <FormField
+                            control={form.control}
+                            name="colocou_carregar"
+                            render={({ field }) => (
+                                <FormItem className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                    <FormLabel className="flex items-center gap-2 text-blue-800 font-medium text-lg mb-3">
+                                        🔌 Colocou para carregar? <span className="text-red-500">*</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Button
+                                                type="button"
+                                                variant={field.value === "sim" ? "default" : "outline"}
+                                                className={`h-12 font-bold border-2 ${field.value === "sim" ? "bg-green-600 hover:bg-green-700 border-green-600" : "bg-white border-blue-200 text-blue-600 hover:bg-blue-50"}`}
+                                                onClick={() => field.onChange("sim")}
+                                            >
+                                                SIM
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={field.value === "nao" ? "default" : "outline"}
+                                                className={`h-12 font-bold border-2 ${field.value === "nao" ? "bg-red-600 hover:bg-red-700 border-red-600" : "bg-white border-blue-200 text-blue-600 hover:bg-blue-50"}`}
+                                                onClick={() => field.onChange("nao")}
+                                            >
+                                                NÃO
                                             </Button>
                                         </div>
                                     </FormControl>
