@@ -71,10 +71,15 @@ export default function DEAPublicDetail() {
 
                 <div className="bg-rose-50 p-6 rounded-xl border border-rose-100 text-center">
                     <div className="inline-flex items-center justify-center p-3 bg-white rounded-full shadow-sm mb-3">
-                        <Battery className="h-8 w-8 text-rose-600" />
+                        <Battery className={`h-8 w-8 ${data.bateria_nivel === 'baixa' ? 'text-red-500' : data.bateria_nivel === 'media' ? 'text-yellow-500' : 'text-green-600'}`} />
                     </div>
                     <p className="text-sm text-rose-800 font-medium uppercase mb-1">Carga da Bateria</p>
-                    <p className="text-4xl font-bold text-rose-900">{data.bateria_porcentagem}%</p>
+                    <p className="text-4xl font-bold text-rose-900">{data.bateria_nivel?.toUpperCase() || `${data.bateria_porcentagem}%`}</p>
+                    {data.colocou_carregar !== undefined && (
+                        <div className={`mt-3 inline-block px-3 py-1 rounded-full text-xs font-bold uppercase ${data.colocou_carregar ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                            {data.colocou_carregar ? "🔌 Colocado para Carregar" : "🔌 Não Carregando"}
+                        </div>
+                    )}
                 </div>
 
                 <div>

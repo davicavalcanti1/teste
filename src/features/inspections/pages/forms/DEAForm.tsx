@@ -93,7 +93,9 @@ export default function DEAForm() {
                 funcionario: values.funcionario,
                 localizacao: values.localizacao,
                 bateria_porcentagem: values.bateria_nivel === 'cheia' ? 100 : values.bateria_nivel === 'media' ? 50 : 10,
-                observacoes: (values.colocou_carregar === 'sim' ? "[CARREGANDO: SIM] " : "[CARREGANDO: NÃO] ") + (values.observacoes || ""),
+                bateria_nivel: values.bateria_nivel,
+                colocou_carregar: values.colocou_carregar === 'sim',
+                observacoes: values.observacoes,
                 fotos_urls: uploadedUrls,
                 data_referencia: format(new Date(), "yyyy-MM-dd"),
                 status: 'finalizado' // Direct finalization
