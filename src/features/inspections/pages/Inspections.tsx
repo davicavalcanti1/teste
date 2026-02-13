@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+<<<<<<< HEAD
 import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets, Coffee, Battery } from "lucide-react";
+=======
+import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets } from "lucide-react";
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 import { format } from "date-fns";
 import { formatProblemType } from "@/lib/utils";
 import { InspectionCharts } from "@/features/inspections/components/InspectionCharts";
@@ -165,6 +169,7 @@ function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo
                                     )}
                                 </div>
                             )}
+<<<<<<< HEAD
 
                             {tipo === 'cafe_agua' && (
                                 <div className="space-y-4">
@@ -216,6 +221,8 @@ function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo
                                     )}
                                 </div>
                             )}
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                         </div>
                     </div>
                 ) : (
@@ -245,12 +252,17 @@ export default function Inspections() {
     const dispenserData = inspections.filter(i => i.tipo === 'dispenser');
     const banheiroData = inspections.filter(i => i.tipo === 'banheiro');
     const acData = inspections.filter(i => i.tipo === 'ar_condicionado');
+<<<<<<< HEAD
     // @ts-ignore
     const cilindrosData = inspections.filter(i => i.tipo === 'cilindros');
     // @ts-ignore
     const copaData = inspections.filter(i => i.tipo === 'cafe_agua');
     // @ts-ignore
     const deaData = inspections.filter(i => i.tipo === 'dea');
+=======
+    // @ts-ignore - 'cilindros' might not be in the type yet if hook isn't updated, but runtime it exists
+    const cilindrosData = inspections.filter(i => i.tipo === 'cilindros');
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 
     // Stats
     const stats = {
@@ -260,8 +272,11 @@ export default function Inspections() {
         banheiro: banheiroData.length,
         ac: acData.length,
         cilindros: cilindrosData.length,
+<<<<<<< HEAD
         copa: copaData.length,
         dea: deaData.length,
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
     };
 
     const getIcon = (tipo: string) => {
@@ -270,8 +285,11 @@ export default function Inspections() {
             case 'banheiro': return <Bath className="h-4 w-4 text-orange-500" />;
             case 'dispenser': return <Droplets className="h-4 w-4 text-cyan-500" />;
             case 'cilindros': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
+<<<<<<< HEAD
             case 'cafe_agua': return <Coffee className="h-4 w-4 text-amber-600" />;
             case 'dea': return <Battery className="h-4 w-4 text-rose-600" />;
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
             default: return <CheckCircle2 className="h-4 w-4" />;
         }
     };
@@ -394,6 +412,7 @@ export default function Inspections() {
                                 <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">Banheiros</CardTitle></CardHeader>
                                 <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.banheiro}</div></CardContent>
                             </Card>
+<<<<<<< HEAD
                             <Card className="md:col-span-1">
                                 <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">Copa (Água/Café)</CardTitle></CardHeader>
                                 <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.copa}</div></CardContent>
@@ -402,6 +421,8 @@ export default function Inspections() {
                                 <CardHeader className="pb-2 p-4"><CardTitle className="text-xs font-medium text-muted-foreground">DEA</CardTitle></CardHeader>
                                 <CardContent className="p-4 pt-0"><div className="text-2xl font-bold">{stats.dea}</div></CardContent>
                             </Card>
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                         </div>
 
                         <InspectionCharts data={inspections} type="geral" />
@@ -457,6 +478,7 @@ export default function Inspections() {
                         {renderTable(cilindrosData, "Nenhuma inspeção de cilindros encontrada.")}
                     </TabsContent>
 
+<<<<<<< HEAD
                     {/* --- Cafe e Agua --- */}
                     <TabsContent value="cafe_agua" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
@@ -478,6 +500,10 @@ export default function Inspections() {
 
                     {/* --- Placeholders Content --- */}
                     {['chiller'].map((key) => (
+=======
+                    {/* --- Placeholders Content --- */}
+                    {['chiller', 'dea', 'cafe_agua'].map((key) => (
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                         <TabsContent key={key} value={key} className="mt-6">
                             <div className="p-12 text-center border rounded-xl bg-gray-50">
                                 <h3 className="text-xl font-semibold text-gray-400 mb-2">Em Breve</h3>

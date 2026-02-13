@@ -12,7 +12,11 @@ import { formatProblemType } from "@/lib/utils";
 
 interface InspectionChartsProps {
     data: InspectionOverview[];
+<<<<<<< HEAD
     type: "geral" | "dispenser" | "banheiro" | "ar_condicionado" | "cilindros" | "cafe_agua";
+=======
+    type: "geral" | "dispenser" | "banheiro" | "ar_condicionado" | "cilindros";
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
@@ -107,9 +111,13 @@ export function InspectionCharts({ data, type }: InspectionChartsProps) {
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">
                         {type === 'ar_condicionado' ? "Por Origem (Equipe)" :
+<<<<<<< HEAD
                             type === 'cilindros' ? "Status" :
                                 type === 'cafe_agua' ? "Item Solicitado" :
                                     type === 'dea' ? "Nível de Bateria" : "Tipos de Problema"}
+=======
+                            type === 'cilindros' ? "Status" : "Tipos de Problema"}
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

@@ -6,7 +6,11 @@ interface PublicFormLayoutProps {
     children: ReactNode;
     title: string;
     subtitle?: string;
+<<<<<<< HEAD
     colorTheme?: "blue" | "green" | "purple" | "orange" | "rose";
+=======
+    colorTheme?: "blue" | "green" | "purple" | "orange";
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 }
 
 export function PublicFormLayout({
@@ -21,7 +25,10 @@ export function PublicFormLayout({
         green: "bg-green-600",
         purple: "bg-purple-600",
         orange: "bg-orange-600",
+<<<<<<< HEAD
         rose: "bg-rose-600",
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
     };
 
     const headerColor = themeColors[colorTheme];

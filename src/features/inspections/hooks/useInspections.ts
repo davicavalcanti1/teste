@@ -3,7 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type InspectionOverview = {
     id: string;
+<<<<<<< HEAD
     tipo: 'dispenser' | 'banheiro' | 'ar_condicionado' | 'cilindros' | 'servico_terceirizado' | 'cafe_agua' | 'dea';
+=======
+    tipo: 'dispenser' | 'banheiro' | 'ar_condicionado' | 'cilindros' | 'servico_terceirizado';
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
     localizacao: string;
     status?: 'aberto' | 'finalizado';
     criado_em: string;
@@ -61,8 +65,11 @@ export function useInspectionDetails(id: string, tipo: string) {
                 case "banheiro": tableName = "inspections_banheiro"; break;
                 case "ar_condicionado": tableName = "inspections_ac"; break;
                 case "cilindros": tableName = "inspecoes_cilindros"; break;
+<<<<<<< HEAD
                 case "cafe_agua": tableName = "inspections_copa"; break;
                 case "dea": tableName = "inspections_dea"; break;
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                 default: throw new Error("Tipo desconhecido");
             }
 

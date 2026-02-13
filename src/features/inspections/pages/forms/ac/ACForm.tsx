@@ -40,7 +40,10 @@ export default function ACForm({ variant }: ACFormProps) {
             limpeza_filtro: false,
             limpeza_carenagem: false,
             teste_funcionamento: false,
+<<<<<<< HEAD
             tipo_manutencao: "preventiva",
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
             observacoes: "",
         },
     });
@@ -113,6 +116,7 @@ export default function ACForm({ variant }: ACFormProps) {
             if (data.limpeza_filtro) atividades.push("Limpeza de Filtro");
             if (data.limpeza_carenagem) atividades.push("Limpeza de Carenagem");
             if (data.teste_funcionamento) atividades.push("Teste de Funcionamento/Gás");
+<<<<<<< HEAD
 
             // Variants
             if (variant === 'dreno') atividades.push("Limpeza de Dreno");
@@ -123,6 +127,11 @@ export default function ACForm({ variant }: ACFormProps) {
                 atividades.push(`Tipo: ${data.tipo_manutencao === 'preventiva' ? 'Preventiva' : 'Corretiva'}`);
             }
 
+=======
+            if (variant === 'dreno') atividades.push("Limpeza de Dreno");
+            if (variant === 'terceirizado') atividades.push("Serviço Terceirizado");
+
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
             // 3. Save to Supabase
             const { error } = await supabase.from("inspections_ac" as any).insert({
                 localizacao: data.localizacao,
@@ -228,6 +237,7 @@ export default function ACForm({ variant }: ACFormProps) {
                             />
                         </div>
 
+<<<<<<< HEAD
                         {/* Maintenance Type - For Dreno and Terceirizado */}
                         {(variant === 'dreno' || variant === 'terceirizado') && (
                             <div className="space-y-4 border rounded-lg p-4 bg-gray-50/50">
@@ -274,6 +284,8 @@ export default function ACForm({ variant }: ACFormProps) {
                             </div>
                         )}
 
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                         {/* Checklist Section - ONLY for Imago */}
                         {variant === 'imago' && (
                             <div className="space-y-4 border rounded-lg p-4 bg-gray-50/50">

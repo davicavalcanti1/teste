@@ -11,7 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+<<<<<<< HEAD
 import { Switch } from "@/components/ui/switch";
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 import { Loader2, CheckCircle } from "lucide-react";
 
 export default function BanheiroOpen() {
@@ -28,12 +31,18 @@ export default function BanheiroOpen() {
             localizacao: localizacaoParam,
             problema: undefined,
             descricao: "",
+<<<<<<< HEAD
             lixeira_cheia: false,
         },
     });
 
     const watchProblema = form.watch("problema");
 
+=======
+        },
+    });
+
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
     useEffect(() => {
         if (localizacaoParam) {
             form.setValue("localizacao", localizacaoParam);
@@ -47,6 +56,7 @@ export default function BanheiroOpen() {
             const randomPart = Math.floor(1000 + Math.random() * 9000);
             const protocol = `WC-${today}-${randomPart}`;
 
+<<<<<<< HEAD
             // Prepare Description based on selection
             let finalDescription = data.descricao || "";
             if (data.problema === 'faltando_insumo' && data.tipo_insumo) {
@@ -65,12 +75,18 @@ export default function BanheiroOpen() {
                     : "Lixeiras Cheias";
             }
 
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
             // Save to Supabase (Banheiro Table)
             const { error } = await supabase.from("inspections_banheiro" as any).insert({
                 protocolo: protocol,
                 localizacao: data.localizacao,
                 problema: data.problema,
+<<<<<<< HEAD
                 descricao: finalDescription,
+=======
+                descricao: data.descricao,
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                 status: "aberto"
             });
 
@@ -84,14 +100,23 @@ export default function BanheiroOpen() {
 Protocolo: ${protocol}
 Local: ${data.localizacao}
 Problema: ${data.problema}
+<<<<<<< HEAD
 Descrição: ${finalDescription}
+=======
+Descrição: ${data.descricao}
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 
 Clique no link para finalizar o chamado:
 ${linkFinalizar}`;
 
             try {
+<<<<<<< HEAD
                 // Change webhook URL for Banheiro //nunca mudar sem me consultar especificamente  
                 await fetch("https://n8n.imagoradiologia.cloud/webhook/banheiro", { //nunca mudar sem me consultar especificamente 
+=======
+                // Change webhook URL for Banheiro
+                await fetch("https://n8n.imagoradiologia.cloud/webhook/banheiro", {
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -166,6 +191,7 @@ ${linkFinalizar}`;
 
                         <FormField
                             control={form.control}
+<<<<<<< HEAD
                             name="lixeira_cheia"
                             render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -189,6 +215,8 @@ ${linkFinalizar}`;
 
                         <FormField
                             control={form.control}
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                             name="problema"
                             render={({ field }) => (
                                 <FormItem>
@@ -200,9 +228,15 @@ ${linkFinalizar}`;
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
+<<<<<<< HEAD
                                             <SelectItem value="faltando_insumo">Faltando Insumo</SelectItem>
                                             <SelectItem value="sujo">Banheiro Sujo</SelectItem>
                                             <SelectItem value="quebrado">Tem algo quebrado?</SelectItem>
+=======
+                                            <SelectItem value="faltando_insumo">Faltando Papel/Sabonete</SelectItem>
+                                            <SelectItem value="sujo">Banheiro Sujo</SelectItem>
+                                            <SelectItem value="quebrado">Vaso/Pia Quebrada</SelectItem>
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
                                             <SelectItem value="outro">Outro Problema</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -211,6 +245,7 @@ ${linkFinalizar}`;
                             )}
                         />
 
+<<<<<<< HEAD
                         {/* Insumos Options - Show only if 'faltando_insumo' */}
                         {watchProblema === 'faltando_insumo' && (
                             <FormField
@@ -259,6 +294,25 @@ ${linkFinalizar}`;
                                 )}
                             />
                         )}
+=======
+                        <FormField
+                            control={form.control}
+                            name="descricao"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>O que precisa ser feito?</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Descreva com detalhes..."
+                                            className="resize-none"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 
                         <div className="pt-2">
                             <Button type="submit" className="w-full h-12 text-lg bg-blue-900 hover:bg-blue-800" disabled={isSubmitting}>

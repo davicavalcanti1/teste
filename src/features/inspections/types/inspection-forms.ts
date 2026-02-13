@@ -31,6 +31,7 @@ export const banheiroOpenSchema = z.object({
     problema: z.enum(["faltando_insumo", "quebrado", "sujo", "outro"], {
         required_error: "Selecione o problema principal",
     }),
+<<<<<<< HEAD
     // Sub-option for 'faltando_insumo'
     tipo_insumo: z.enum(["sabonete", "papel_higienico", "papel_toalha"]).optional(),
 
@@ -41,6 +42,9 @@ export const banheiroOpenSchema = z.object({
 
     // New field for Full Trash Cans
     lixeira_cheia: z.boolean().default(false),
+=======
+    descricao: z.string().min(3, "Descreva o que precisa ser feito"),
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 });
 
 export type BanheiroOpenForm = z.infer<typeof banheiroOpenSchema>;
@@ -58,9 +62,12 @@ export const acSchema = z.object({
     modelo: z.string().optional(),
     numero_serie: z.string().optional(),
 
+<<<<<<< HEAD
     // Maintenance Type (Preventive vs Corrective)
     tipo_manutencao: z.enum(["preventiva", "corretiva"]).optional(),
 
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
     // Checklist dynamic based on origin?
     limpeza_filtro: z.boolean().default(false),
     limpeza_carenagem: z.boolean().default(false),

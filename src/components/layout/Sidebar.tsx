@@ -46,7 +46,10 @@ export function Sidebar() {
         { href: "/inspecoes", label: "Inspeções", icon: CheckCircle2, adminOnly: false },
         { href: "/analise", label: "Anamnese", icon: ClipboardList, adminOnly: true },
         { href: "/livro", label: "Livro", icon: BookOpen, adminOnly: false },
+<<<<<<< HEAD
         { href: "/funcionarios", label: "Funcionários", icon: User, allowedRoles: ['admin', 'rh'] },
+=======
+>>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
     ].filter(link => {
         if (link.adminOnly && !isAdmin) return false;
 
