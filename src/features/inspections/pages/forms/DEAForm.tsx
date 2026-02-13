@@ -89,7 +89,6 @@ export default function DEAForm() {
                 funcionario: values.funcionario,
                 localizacao: values.localizacao,
                 bateria_porcentagem: values.bateria_nivel === 'cheia' ? 100 : values.bateria_nivel === 'media' ? 50 : 10,
-                status_bateria: values.bateria_nivel, // Adicionando o nível textual se possível/necessário
                 observacoes: values.observacoes,
                 fotos_urls: uploadedUrls,
                 data_referencia: format(new Date(), "yyyy-MM-dd"),
