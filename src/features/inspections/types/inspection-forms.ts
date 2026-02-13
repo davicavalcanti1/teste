@@ -41,6 +41,9 @@ export const banheiroOpenSchema = z.object({
 
     // New field for Full Trash Cans
     lixeira_cheia: z.boolean().default(false),
+    lixeira_comum: z.boolean().default(false),
+    lixeira_contaminante: z.boolean().default(false),
+    lixeira_batas: z.boolean().default(false),
 });
 
 export type BanheiroOpenForm = z.infer<typeof banheiroOpenSchema>;

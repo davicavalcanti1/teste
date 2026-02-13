@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, CheckCircle } from "lucide-react";
 
 export default function BanheiroOpen() {
@@ -29,6 +30,9 @@ export default function BanheiroOpen() {
             problema: undefined,
             descricao: "",
             lixeira_cheia: false,
+            lixeira_comum: false,
+            lixeira_contaminante: false,
+            lixeira_batas: false,
         },
     });
 
@@ -57,11 +61,20 @@ export default function BanheiroOpen() {
                 finalDescription = `Repor: ${insumoLabels[data.tipo_insumo] || data.tipo_insumo}`;
             }
 
-            // Append Trash Can status
+            // Append Trash Can status with Types
             if (data.lixeira_cheia) {
-                finalDescription = finalDescription
-                    ? `${finalDescription} | Lixeiras Cheias`
+                const tiposLixeira = [];
+                if (data.lixeira_comum) tiposLixeira.push("Comum");
+                if (data.lixeira_contaminante) tiposLixeira.push("Contaminante");
+                if (data.lixeira_batas) tiposLixeira.push("Batas");
+
+                const lixeiraDesc = tiposLixeira.length > 0
+                    ? `Lixeiras Cheias (${tiposLixeira.join(", ")})`
                     : "Lixeiras Cheias";
+
+                finalDescription = finalDescription
+                    ? `${finalDescription} | ${lixeiraDesc}`
+                    : lixeiraDesc;
             }
             // Save to Supabase (Banheiro Table)
             const { error } = await supabase.from("inspections_banheiro" as any).insert({
@@ -166,21 +179,88 @@ ${linkFinalizar}`;
                             control={form.control}
                             name="lixeira_cheia"
                             render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                    <div className="space-y-0.5">
-                                        <FormLabel className="text-base">
-                                            Lixeiras Cheias?
-                                        </FormLabel>
-                                        <div className="text-sm text-muted-foreground">
-                                            (Lixo comum, Lixo contaminado, Lixeiro de batas)
+                                <FormItem className="flex flex-col space-y-4 rounded-lg border p-4">
+                                    <div className="flex flex-row items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <FormLabel className="text-base">
+                                                Lixeiras Cheias?
+                                            </FormLabel>
+                                            <div className="text-sm text-muted-foreground">
+                                                Marque se houver lixeiras para recolher
+                                            </div>
                                         </div>
+                                        <FormControl>
+                                            <Switch
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
                                     </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                    </FormControl>
+
+                                    {/* Checkboxes for Trash Types */}
+                                    {field.value && (
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 animate-in slide-in-from-top-2 duration-300">
+                                            <FormField
+                                                control={form.control}
+                                                name="lixeira_comum"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 bg-gray-50/50">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel className="font-normal cursor-pointer text-gray-700">
+                                                                Lixo Comum
+                                                            </FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="lixeira_contaminante"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 bg-orange-50/50 border-orange-100">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                                className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel className="font-normal cursor-pointer text-orange-900">
+                                                                Contaminante
+                                                            </FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="lixeira_batas"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 bg-blue-50/50 border-blue-100">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                                className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel className="font-normal cursor-pointer text-blue-900">
+                                                                Batas
+                                                            </FormLabel>
+                                                        </div>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
                                 </FormItem>
                             )}
                         />
