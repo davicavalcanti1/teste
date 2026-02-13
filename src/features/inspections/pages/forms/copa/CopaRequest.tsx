@@ -91,7 +91,13 @@ export default function CopaRequest() {
 
         setIsSubmitting(true);
         try {
-            const gpMessage = `✅ *Resolvido:* O abastecimento foi realizado por *${responsavelName}*.`;
+            // Determine active items being finalized based on URL params
+            let itemsFinalized = [];
+            if (showWater) itemsFinalized.push("Água");
+            if (showCoffee) itemsFinalized.push("Café");
+            const itemDesc = itemsFinalized.length > 0 ? itemsFinalized.join(" e ") : "Item";
+
+            const gpMessage = `✅ *Resolvido:* O abastecimento de *${itemDesc}* em *${locationParam}* foi realizado por *${responsavelName}*.`;
 
             // 1. Update Supabase (Close open requests for this location/item)
             let query = supabase.from("inspections_copa" as any)
@@ -119,7 +125,9 @@ export default function CopaRequest() {
                 body: JSON.stringify({
                     event_type: "finalizar",
                     responsavel: responsavelName,
-                    gp_message: gpMessage
+                    gp_message: gpMessage,
+                    location: locationParam,
+                    item: itemDesc
                 })
             });
 
@@ -166,6 +174,11 @@ export default function CopaRequest() {
                 */}
                 {!isFinalizeMode && (
                     <div className="grid gap-6">
+                        <div className="text-center mb-4">
+                            <p className="text-sm text-gray-500">Localização</p>
+                            <h2 className="text-xl font-bold text-gray-800">{locationParam}</h2>
+                        </div>
+
                         {!showWater && !showCoffee && (
                             <div className="text-center text-gray-500 py-10">
                                 Nenhum item selecionado na URL. (use ?water=true ou ?coffee=true)
@@ -209,6 +222,17 @@ export default function CopaRequest() {
                 */}
                 {isFinalizeMode && (
                     <form onSubmit={handleFinalize} className="space-y-6">
+                        <div className="text-center mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            <p className="text-sm text-gray-500 uppercase tracking-wide font-semibold">Finalizando Abastecimento</p>
+                            <div className="mt-2 space-y-1">
+                                <p className="text-gray-800"><span className="font-bold">Local:</span> {locationParam}</p>
+                                <p className="text-gray-800">
+                                    <span className="font-bold">Item:</span>{' '}
+                                    {showWater && showCoffee ? "Água e Café" : showWater ? "Água" : showCoffee ? "Café" : "Solicitação"}
+                                </p>
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
                             <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Seu Nome
