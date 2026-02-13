@@ -236,13 +236,13 @@ export default function NovaOcorrenciaForm() {
         });
       } else {
         // Map frontend types to backend enum types
-        let backendType = data.tipo;
+        let backendType: any = data.tipo;
         if (data.tipo === 'revisao_exame') {
           backendType = 'assistencial'; // Mapping revisao_exame to assistencial
         }
 
         occurrence = await createOccurrence.mutateAsync({
-          tipo: backendType,
+          tipo: backendType as any,
           subtipo: data.subtipo,
           paciente_nome_completo: data.paciente.nomeCompleto,
           paciente_telefone: data.paciente.telefone,
@@ -320,13 +320,13 @@ export default function NovaOcorrenciaForm() {
           criado_em: occurrence.criado_em,
           criado_por: profile?.id,
           criado_por_nome: profile?.full_name,
-          link: `https://teste.imagoradiolgoia.cloud/ocorrencias/${occurrence.id}`,
+          link: `https://ocorrencias.imagoradiologia.cloud/ocorrencias/${occurrence.id}`,
           anexos: attachmentsForWebhook,
           timestamp: new Date().toISOString(),
         };
 
         // Fire and forget
-        fetch("https://n8n.imagoradiolgoia.cloud/webhook/envio", {
+        fetch("https://n8n.imagoradiologia.cloud/webhook/envio", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(webhookPayload),

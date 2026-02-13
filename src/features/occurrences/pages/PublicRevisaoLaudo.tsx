@@ -164,9 +164,9 @@ export default function PublicRevisaoLaudo() {
 
       if (error) throw error;
 
-      // 2. Call Webhook (Response)
+      // 2. Call Webhook (Response) //nunca mudar sem me consultar especificamente 
       try {
-        await fetch("https://teste.imagoradiolgoia.cloud/webhook/confirmacao", {
+        await fetch("https://n8n.imagoradiolgoia.cloud/webhook/confirmacao", { //nunca mudar sem me consultar especificamente 
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -253,7 +253,7 @@ export default function PublicRevisaoLaudo() {
 
       // 3. Call Webhook (Response)
       try {
-        await fetch("https://teste.imagoradiolgoia.cloud/webhook/confirmacao", {
+        await fetch("https://n8n.imagoradiolgoia.cloud/webhook/confirmacao", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -334,7 +334,7 @@ export default function PublicRevisaoLaudo() {
 
       // 3. Call Webhook (Response)
       try {
-        await fetch("https://teste.imagoradiolgoia.cloud/webhook/confirmacao", {
+        await fetch("https://n8n.imagoradiolgoia.cloud/webhook/confirmacao", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

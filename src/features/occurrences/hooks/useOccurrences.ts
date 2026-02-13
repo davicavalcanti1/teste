@@ -796,12 +796,12 @@ export function useUpdateOccurrenceStatus() {
             finalizado_em: new Date().toISOString(),
             finalizado_por: profile.id,
             pdf_url: pdfUrl,
-            link: `https://teste.imagoradiolgoia.cloud/ocorrencias/${od.id}`,
+            link: `https://ocorrencias.imagoradiologia.cloud/ocorrencias/${od.id}`,
             anexos: attachments,
           };
 
           // Send to n8n webhook for finalization (direct fetch)
-          fetch("https://teste.imagoradiolgoia.cloud/webhook/finalizado", {
+          fetch("https://n8n.imagoradiolgoia.cloud/webhook/finalizado", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(webhookPayload),
