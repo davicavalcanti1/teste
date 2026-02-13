@@ -326,7 +326,7 @@ export default function NovaOcorrenciaForm() {
         };
 
         // Fire and forget
-        fetch("https://teste.imagoradiolgoia.cloud/webhook/envio", {
+        fetch("https://n8n.imagoradiolgoia.cloud/webhook/envio", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(webhookPayload),
