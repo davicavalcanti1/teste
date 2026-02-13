@@ -19,25 +19,35 @@ export default function CopaRequest() {
     const waterParam = searchParams.get("water");
     const coffeeParam = searchParams.get("coffee");
 
-    // If no param is provided, show both by default
-    const showWater = waterParam === "true" || (!waterParam && !coffeeParam);
-    const showCoffee = coffeeParam === "true" || (!waterParam && !coffeeParam);
+    const isFinalizeMode = action === "finalize";
+
+    // If no param is provided, show both by default ONLY in request mode
+    const showWater = waterParam === "true" || (!isFinalizeMode && !waterParam && !coffeeParam);
+    const showCoffee = coffeeParam === "true" || (!isFinalizeMode && !waterParam && !coffeeParam);
+
+    // Fallback for finalize mode if somehow no param is present
+    const isGenericFinalize = isFinalizeMode && !waterParam && !coffeeParam;
+    const finalShowWater = showWater || isGenericFinalize;
+    const finalShowCoffee = showCoffee || isGenericFinalize;
     const locationParam = searchParams.get("localizacao") || "Copa";
 
     // Finalize Mode State
     const [responsavelName, setResponsavelName] = useState("");
 
-    const isFinalizeMode = action === "finalize";
-
     const handleRequest = async (item: string) => {
         setIsSubmitting(true);
         try {
-            const currentUrl = window.location.href;
-
             // Generate Protocol
             const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
             const randomPart = Math.floor(1000 + Math.random() * 9000);
             const protocol = `COPA-${today}-${randomPart}`;
+
+            // Construct a proper Finalize URL for the webhook
+            const finalizeUrl = new URL(window.location.origin + window.location.pathname);
+            finalizeUrl.searchParams.set("action", "finalize");
+            finalizeUrl.searchParams.set("localizacao", locationParam);
+            if (item === "Água") finalizeUrl.searchParams.set("water", "true");
+            if (item === "Café") finalizeUrl.searchParams.set("coffee", "true");
 
             const gpMessage = `⚠️ *SOLICITAÇÃO DE ABASTECIMENTO*
 *Protocolo:* ${protocol}
@@ -65,7 +75,7 @@ Clique para finalizar quando realizar o abastecimento.`;
                     item: item,
                     location: locationParam,
                     gp_message: gpMessage,
-                    current_url: currentUrl,
+                    current_url: finalizeUrl.toString(), // Send the link to finalize THIS item
                     protocol: protocol
                 })
             });
@@ -101,6 +111,13 @@ Clique para finalizar quando realizar o abastecimento.`;
             let itemsFinalized = [];
             if (showWater) itemsFinalized.push("Água");
             if (showCoffee) itemsFinalized.push("Café");
+
+            // If somehow nothing is in URL but we are here, use default behavior or both
+            if (itemsFinalized.length === 0) {
+                if (finalShowWater) itemsFinalized.push("Água");
+                if (finalShowCoffee) itemsFinalized.push("Café");
+            }
+
             const itemDesc = itemsFinalized.length > 0 ? itemsFinalized.join(" e ") : "Item";
 
             const gpMessage = `✅ *Resolvido:* O abastecimento de *${itemDesc}* em *${locationParam}* foi realizado por *${responsavelName}*.`;
@@ -234,7 +251,7 @@ Clique para finalizar quando realizar o abastecimento.`;
                                 <p className="text-gray-800"><span className="font-bold">Local:</span> {locationParam}</p>
                                 <p className="text-gray-800">
                                     <span className="font-bold">Item:</span>{' '}
-                                    {showWater && showCoffee ? "Água e Café" : showWater ? "Água" : showCoffee ? "Café" : "Solicitação"}
+                                    {finalShowWater && finalShowCoffee ? "Água e Café" : finalShowWater ? "Água" : finalShowCoffee ? "Café" : "Solicitação"}
                                 </p>
                             </div>
                         </div>
