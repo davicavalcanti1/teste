@@ -111,7 +111,7 @@ export function SendToDoctorModal({
       // Generate public token in the browser
       const publicToken = generateSecureToken();
       // Using production domain
-      const publicLink = `https://ocorrencias.imagoradiologia.cloud/public/revisao-laudo/${publicToken}`;
+      const publicLink = `https://gestao.imagoradiologia.cloud/public/revisao-laudo/${publicToken}`;
 
       // Get user for history
       const { data: userData } = await supabase.auth.getUser();

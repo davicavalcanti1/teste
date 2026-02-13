@@ -198,7 +198,7 @@ export function generateOccurrencePDF({
 
   // Use public token for the link if available
   const publicToken = occurrence.publicToken || occurrence.id; // Fallback to ID if token missing (internal use)
-  const appUrl = "https://ocorrencias.imagoradiologia.cloud";
+  const appUrl = "https://gestao.imagoradiologia.cloud";
   // If we have a public token, use the public route, otherwise regular route
   const linkPath = occurrence.publicToken ? `/public/imagens/${publicToken}` : `/ocorrencias/${occurrence.id}`;
   const qrData = `${appUrl}${linkPath}`;

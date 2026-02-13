@@ -796,7 +796,7 @@ export function useUpdateOccurrenceStatus() {
             finalizado_em: new Date().toISOString(),
             finalizado_por: profile.id,
             pdf_url: pdfUrl,
-            link: `https://ocorrencias.imagoradiologia.cloud/ocorrencias/${od.id}`,
+            link: `https://gestao.imagoradiologia.cloud/ocorrencias/${od.id}`,
             anexos: attachments,
           };
 

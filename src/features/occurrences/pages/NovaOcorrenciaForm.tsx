@@ -320,7 +320,7 @@ export default function NovaOcorrenciaForm() {
           criado_em: occurrence.criado_em,
           criado_por: profile?.id,
           criado_por_nome: profile?.full_name,
-          link: `https://ocorrencias.imagoradiologia.cloud/ocorrencias/${occurrence.id}`,
+          link: `https://gestao.imagoradiologia.cloud/ocorrencias/${occurrence.id}`,
           anexos: attachmentsForWebhook,
           timestamp: new Date().toISOString(),
         };
