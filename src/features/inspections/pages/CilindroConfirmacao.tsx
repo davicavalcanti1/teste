@@ -133,7 +133,8 @@ export default function CilindroConfirmacao() {
                 const response = await fetch('https://n8n.imagoradiologia.cloud/webhook/cilindro-confirmado', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(webhookPayload)
                 });
