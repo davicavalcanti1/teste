@@ -190,7 +190,7 @@ export function SendToDoctorModal({
       }
 
       // Send webhook to notify doctor //nunca mudar sem me consultar especificamente 
-      const webhookUrl = "https://n8n.imagoradiolgoia.cloud/webhook/medico"; //nunca mudar sem me consultar especificamente 
+      const webhookUrl = "https://n8n.imagoradiologia.cloud/webhook/medico"; //nunca mudar sem me consultar especificamente 
 
       try {
         await fetch(webhookUrl, {

@@ -801,7 +801,7 @@ export function useUpdateOccurrenceStatus() {
           };
 
           // Send to n8n webhook for finalization (direct fetch)
-          fetch("https://n8n.imagoradiolgoia.cloud/webhook/finalizado", {
+          fetch("https://n8n.imagoradiologia.cloud/webhook/finalizado", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(webhookPayload),
