@@ -229,7 +229,10 @@ const App = () => (
             <Route path="/formularios/banheiro/abrir" element={<BanheiroOpen />} />
             <Route path="/formularios/banheiro/finalizar" element={<BanheiroClose />} />
             <Route path="/formularios/banheiro/ralo" element={<BanheiroRalo />} />
+            {/* Copa Forms */}
             <Route path="/formularios/copa" element={<CopaRequest />} />
+            <Route path="/formularios/gelagua-cafe/abrir" element={<CopaRequest />} />
+            <Route path="/formularios/gelagua-cafe/fechar" element={<CopaRequest />} />
 
 
             {/* AC Forms */}
