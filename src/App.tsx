@@ -16,10 +16,7 @@ import Configuracoes from "./pages/Configuracoes";
 import Perfil from "./pages/Perfil";
 import NotFound from "./pages/NotFound";
 import Instructions from "./pages/Instructions";
-<<<<<<< HEAD
 import Employees from "./pages/Employees";
-=======
->>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 
 // Occurrence pages
 import OcorrenciasMenu from "./features/occurrences/pages/OcorrenciasMenu";
@@ -50,18 +47,12 @@ import DispenserClose from "./features/inspections/pages/forms/dispenser/Dispens
 import BanheiroOpen from "./features/inspections/pages/forms/banheiro/BanheiroOpen";
 import BanheiroClose from "./features/inspections/pages/forms/banheiro/BanheiroClose";
 import BanheiroRalo from "./features/inspections/pages/forms/banheiro/BanheiroRalo";
-<<<<<<< HEAD
 import CopaRequest from "./features/inspections/pages/forms/copa/CopaRequest";
 import ACForm from "./features/inspections/pages/forms/ac/ACForm";
 import CilindrosForm from "./features/inspections/pages/forms/CilindrosForm";
 import CilindroConfirmacao from "./features/inspections/pages/CilindroConfirmacao";
 import DEAForm from "./features/inspections/pages/forms/DEAForm";
 import DEAPublicDetail from "./features/inspections/pages/DEAPublicDetail";
-=======
-import ACForm from "./features/inspections/pages/forms/ac/ACForm";
-import CilindrosForm from "./features/inspections/pages/forms/CilindrosForm";
-import CilindroConfirmacao from "./features/inspections/pages/CilindroConfirmacao";
->>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 
 
 
@@ -214,16 +205,12 @@ const App = () => (
               </ProtectedRoute>
             } />
 
-<<<<<<< HEAD
             {/* Employees Management (Admin/RH) */}
             <Route path="/funcionarios" element={
               <ProtectedRoute allowedRoles={['admin', 'rh']}>
                 <Employees />
               </ProtectedRoute>
             } />
-
-=======
->>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
             {/* Generic Details Route - Must be last in /ocorrencias list */}
             <Route path="/ocorrencias/:id" element={
               <ProtectedRoute allowedRoles={['admin', 'user', 'rh', 'enfermagem']}>
@@ -242,10 +229,7 @@ const App = () => (
             <Route path="/formularios/banheiro/abrir" element={<BanheiroOpen />} />
             <Route path="/formularios/banheiro/finalizar" element={<BanheiroClose />} />
             <Route path="/formularios/banheiro/ralo" element={<BanheiroRalo />} />
-<<<<<<< HEAD
             <Route path="/formularios/copa" element={<CopaRequest />} />
-=======
->>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
 
 
             {/* AC Forms */}
@@ -255,13 +239,10 @@ const App = () => (
 
             {/* Cylinder New Form */}
             <Route path="/inspecoes/cilindros" element={<CilindrosForm />} />
-<<<<<<< HEAD
 
             {/* DEA Forms */}
             <Route path="/inspecoes/dea" element={<DEAForm />} />
             <Route path="/inspecoes/dea/view/:protocol" element={<DEAPublicDetail />} />
-=======
->>>>>>> cc41edc2712e5cd54dc9f3e9376e17f0ef54cf91
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
 
