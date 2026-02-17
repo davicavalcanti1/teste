@@ -12,6 +12,7 @@ import { Loader2, Filter, AlertCircle, CheckCircle2, Snowflake, Bath, Droplets, 
 import { format } from "date-fns";
 import { formatProblemType } from "@/lib/utils";
 import { InspectionCharts } from "@/features/inspections/components/InspectionCharts";
+import { ACManagement } from "@/features/inspections/components/ac_custom/ACManagement";
 
 // --- SUB-COMPONENT: DETAILS DRAWER (DIALOG) ---
 function InspectionDetailsDrawer({ id, tipo, open, onClose }: { id: string, tipo: string, open: boolean, onClose: () => void }) {
@@ -430,11 +431,15 @@ export default function Inspections() {
                     {/* --- AC --- */}
                     <TabsContent value="ac" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-blue-800">Dashboard de Climatização</h2>
+                            <h2 className="text-lg font-semibold text-blue-800">Painel de Climatização</h2>
                             <Badge variant="outline" className="text-blue-600 bg-blue-50">{acData.length} Registros</Badge>
                         </div>
-                        <InspectionCharts data={acData} type="ar_condicionado" />
-                        {renderTable(acData, "Nenhuma manutenção de AC encontrada.")}
+
+                        <ACManagement
+                            data={acData}
+                            isLoading={isLoading}
+                            onRowClick={(id, tipo) => setSelectedItem({ id, tipo })}
+                        />
                     </TabsContent>
 
                     {/* --- Reports Preview --- */}
