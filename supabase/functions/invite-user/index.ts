@@ -69,28 +69,23 @@ serve(async (req: Request) => {
     if (!authHeader) {
       console.error("[Invite-User] Missing Authorization header");
       return new Response(
-        JSON.stringify({ error: "Missing authorization header" }),
+        JSON.stringify({ error: "Faltando cabeçalho de autorização" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Create Supabase client with service role for admin operations
+    const token = authHeader.replace("Bearer ", "");
+
+    // Create Supabase client with service role
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
-    // Create regular client to verify the requesting user
-    const supabaseClient = createClient(supabaseUrl, anonKey, {
-      global: {
-        headers: { Authorization: authHeader },
-      },
-    });
-
-    // Get the requesting user
-    const { data: { user: requestingUser }, error: userError } = await supabaseClient.auth.getUser();
+    // Verify the requesting user directly using the token
+    const { data: { user: requestingUser }, error: userError } = await supabaseAdmin.auth.getUser(token);
 
     if (userError || !requestingUser) {
-      console.error("[Invite-User] getUser error or user not found:", userError?.message);
+      console.error("[Invite-User] Token validation failed:", userError?.message);
       return new Response(
-        JSON.stringify({ error: "Unauthorized", details: userError?.message }),
+        JSON.stringify({ error: "Sessão inválida ou expirada", details: userError?.message }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

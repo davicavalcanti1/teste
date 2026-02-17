@@ -152,6 +152,9 @@ export function UserManagement() {
       const { data: { session } } = await supabase.auth.getSession();
       const { data, error } = await supabase.functions.invoke("invite-user", {
         body: values,
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
 
       if (error) {
@@ -254,8 +257,12 @@ export function UserManagement() {
   // Delete user mutation
   const deleteUser = useMutation({
     mutationFn: async (userId: string) => {
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await supabase.functions.invoke("delete-user", {
         body: { user_id: userId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
 
       if (response.error) {
@@ -287,8 +294,12 @@ export function UserManagement() {
   // Update user mutation
   const updateUser = useMutation({
     mutationFn: async (values: EditUserValues & { user_id: string }) => {
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await supabase.functions.invoke("update-user", {
         body: values,
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
 
       if (response.error) {
