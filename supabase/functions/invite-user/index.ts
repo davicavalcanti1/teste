@@ -75,12 +75,7 @@ serve(async (req: Request) => {
     }
 
     // Create Supabase client with service role for admin operations
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
     // Create regular client to verify the requesting user
     const supabaseClient = createClient(supabaseUrl, anonKey, {
@@ -90,21 +85,12 @@ serve(async (req: Request) => {
     });
 
     // Get the requesting user
-    console.log("[Invite-User] Verifying user token...");
     const { data: { user: requestingUser }, error: userError } = await supabaseClient.auth.getUser();
 
-    if (userError) {
-      console.error("[Invite-User] getUser error:", userError.message);
+    if (userError || !requestingUser) {
+      console.error("[Invite-User] getUser error or user not found:", userError?.message);
       return new Response(
-        JSON.stringify({ error: "Unauthorized", details: userError.message }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!requestingUser) {
-      console.error("[Invite-User] No user found for this token");
-      return new Response(
-        JSON.stringify({ error: "Unauthorized", message: "User not found" }),
+        JSON.stringify({ error: "Unauthorized", details: userError?.message }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

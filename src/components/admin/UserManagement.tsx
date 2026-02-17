@@ -152,9 +152,6 @@ export function UserManagement() {
       const { data: { session } } = await supabase.auth.getSession();
       const { data, error } = await supabase.functions.invoke("invite-user", {
         body: values,
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
       });
 
       if (error) {
