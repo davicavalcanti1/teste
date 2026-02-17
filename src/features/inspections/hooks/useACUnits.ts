@@ -25,7 +25,7 @@ export function useACUnits() {
             const { data: units, error: unitsError } = await supabase
                 .from("ac_units" as any)
                 .select("*")
-                .order("localizacao");
+                .order("id_qrcode");
 
             if (unitsError) throw unitsError;
 
@@ -38,8 +38,9 @@ export function useACUnits() {
             if (inspectionsError) throw inspectionsError;
 
             // 3. Process data
+            const acInspections = (inspections || []) as any[];
             return (units as any[]).map((unit) => {
-                const unitInspections = inspections?.filter(i => i.numero_serie === unit.numero_serie) || [];
+                const unitInspections = acInspections.filter(i => i.numero_serie === unit.numero_serie) || [];
 
                 const lastMaintenance = unitInspections[0]; // Ordered by created_at desc
                 const lastCleaningImago = unitInspections.find(i => i.origem === 'imago');
