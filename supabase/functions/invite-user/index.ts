@@ -177,75 +177,62 @@ serve(async (req: Request) => {
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(u => u.email === email);
 
+    let userId: string;
+    let authData: any = null;
+
     if (existingUser) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "email_exists",
-          message: "Este email já está cadastrado.",
-        }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Generate a secure invite token
-    const inviteToken = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    // Store the invite in a pending_invites record (we'll use password_reset_tokens table or create invite)
-    // For now, we'll use a temporary password and send magic link
-    const tempPassword = crypto.randomUUID();
-
-    // Create auth user with temporary password
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password: tempPassword,
-      email_confirm: true, // We confirm email since we verify it ourselves
-      user_metadata: {
-        full_name,
-        needs_password_setup: true,
-      },
-    });
-
-    if (authError) {
-      console.error("Auth error:", authError);
-      if ((authError as any)?.code === "email_exists") {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: "email_exists",
-            message: "Este email já está cadastrado.",
-          }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      return new Response(
-        JSON.stringify({ success: false, error: authError.message }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const userId = authData.user.id;
-    const desiredRole = role || "user";
-
-    console.log(`Created user ${userId}, setting up profile and role`);
-
-    // Create profile
-    const { error: upsertProfileError } = await supabaseAdmin
-      .from("profiles")
-      .upsert({
+      console.log(`User ${email} already exists, will resend invite`);
+      userId = existingUser.id;
+      // Ensure profile exists for existing user
+      await supabaseAdmin.from("profiles").upsert({
         id: userId,
         tenant_id,
         full_name,
         email,
         is_active: true,
       }, { onConflict: "id" });
+    } else {
+      // Create auth user with temporary password
+      const tempPassword = crypto.randomUUID();
+      const { data: createdAuthData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: {
+          full_name,
+          needs_password_setup: true,
+        },
+      });
 
-    if (upsertProfileError) {
-      console.error("Profile error:", upsertProfileError);
+      if (authError) {
+        console.error("Auth error:", authError);
+        return new Response(
+          JSON.stringify({ success: false, error: authError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      authData = createdAuthData;
+      userId = authData.user.id;
+
+      // Create profile
+      const { error: upsertProfileError } = await supabaseAdmin
+        .from("profiles")
+        .upsert({
+          id: userId,
+          tenant_id,
+          full_name,
+          email,
+          is_active: true,
+        }, { onConflict: "id" });
+
+      if (upsertProfileError) {
+        console.error("Profile error:", upsertProfileError);
+      }
     }
 
-    // Set up role
+    const desiredRole = role || "user";
+
+    // Set up role (update if exists)
     await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
 
     const { error: roleError } = await supabaseAdmin
@@ -260,10 +247,8 @@ serve(async (req: Request) => {
       console.error("Role error:", roleError);
     }
 
-    // Generate password reset link so user can set their own password
-
     const SITE_URL =
-      Deno.env.get("SITE_URL") || "https://ocorrencias.imagoradiologia.cloud";
+      Deno.env.get("SITE_URL") || "https://gestao.imagoradiologia.cloud";
 
     const { data: resetData, error: resetError } =
       await supabaseAdmin.auth.admin.generateLink({

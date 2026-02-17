@@ -91,7 +91,7 @@ interface UserWithRole {
 }
 
 export function UserManagement() {
-  const { profile } = useAuth();
+  const { profile, role } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -393,7 +393,7 @@ export function UserManagement() {
           <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800 font-mono">
             Debugging:
             <br />Tenant ID: {profile?.tenant_id}
-            <br />App Role: {profile?.role}
+            <br />App Role: {role}
             <br />Users Found: {users.length}
             <br />RLS Active on Profiles? (Likely Yes)
           </div>
@@ -401,9 +401,9 @@ export function UserManagement() {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button disabled={true} className="gap-2">
+            <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              Novo Usuário (Inativo)
+              Novo Usuário
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md bg-card border-border shadow-2xl rounded-3xl p-0 overflow-hidden">
@@ -508,13 +508,13 @@ export function UserManagement() {
                     >
                       Cancelar
                     </Button>
-                    <Button type="submit" disabled={true} className="gap-2">
+                    <Button type="submit" className="gap-2">
                       {inviteUser.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <Mail className="h-4 w-4" />
                       )}
-                      Enviar Convite (Temporariamente Inativo)
+                      Enviar Convite
                     </Button>
                   </div>
                 </form>
@@ -626,6 +626,26 @@ export function UserManagement() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
+                      {user.approved === false && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 text-blue-600 border-blue-200 hover:bg-blue-50"
+                          onClick={() => inviteUser.mutate({
+                            full_name: user.full_name,
+                            email: user.email,
+                            role: user.role
+                          })}
+                          disabled={inviteUser.isPending}
+                        >
+                          {inviteUser.isPending ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Mail className="h-3 w-3 mr-1" />
+                          )}
+                          Reenviar Convite
+                        </Button>
+                      )}
                       {user.approved === false && (
                         <Button
                           size="sm"

@@ -110,7 +110,6 @@ export function SendToDoctorModal({
 
       // Generate public token in the browser
       const publicToken = generateSecureToken();
-      // Using production domain
       const publicLink = `https://gestao.imagoradiologia.cloud/public/revisao-laudo/${publicToken}`;
 
       // Get user for history
