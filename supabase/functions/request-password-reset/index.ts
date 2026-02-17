@@ -57,11 +57,10 @@ serve(async (req) => {
 
         let resetLink = data.properties.action_link;
 
-        // Safety check to ensure the domain is correct
-        if (resetLink && !resetLink.includes("gestao.imagoradiologia.cloud")) {
-            resetLink = resetLink.replace("ocorrencias.imagoradiologia.cloud", "gestao.imagoradiologia.cloud");
-            resetLink = resetLink.replace("gesto.imagoradiologia.cloud", "gestao.imagoradiologia.cloud");
-            resetLink = resetLink.replace("teste.imagoradiologia.cloud", "gestao.imagoradiologia.cloud");
+        // Force the correct domain regardless of Supabase settings
+        if (resetLink) {
+            // This regex replaces any subdomain of imagoradiologia.cloud with 'gestao'
+            resetLink = resetLink.replace(/https:\/\/[^.]+\.imagoradiologia\.cloud/, "https://gestao.imagoradiologia.cloud");
         }
 
         // Send email via Resend
