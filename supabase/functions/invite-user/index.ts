@@ -178,7 +178,7 @@ serve(async (req: Request) => {
       const { data: createdAuthData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password: tempPassword,
-        email_confirm: true,
+        email_confirm: false, // IMPORTANTE: Mudar para false para o Supabase não enviar e-mail automático
         user_metadata: {
           full_name,
           needs_password_setup: true,
