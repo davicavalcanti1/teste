@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.40.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
@@ -74,22 +74,52 @@ serve(async (req) => {
         <html>
         <head>
           <meta charset="utf-8">
-          <title>Redefinição de Senha</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Redefinição de Senha - Imago</title>
         </head>
-        <body style="font-family: sans-serif; background-color: #f4f4f4; padding: 40px 20px;">
-          <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <div style="background: #325C93; padding: 30px; text-align: center;">
-              <h1 style="color: white; margin: 0;">Ocorrências Imago</h1>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 20px;">
+          <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(50,92,147,0.1);">
+            
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #325C93 0%, #4a7ab8 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 26px; font-weight: bold; letter-spacing: -0.5px;">Ocorrências Imago</h1>
+              <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 14px;">Excelência em Diagnóstico</p>
             </div>
-            <div style="padding: 40px 30px;">
-              <h2 style="color: #333;">Recuperação de Acesso</h2>
-              <p style="color: #555; line-height: 1.6;">Você solicitou a redefinição de sua senha. Clique no botão abaixo para prosseguir:</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${resetLink}" style="background: #325C93; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">Redefinir Senha</a>
+            
+            <!-- Content -->
+            <div style="padding: 40px 35px;">
+              <h2 style="color: #1e293b; margin: 0 0 15px 0; font-size: 20px; font-weight: 700;">Recuperação de Acesso</h2>
+              
+              <p style="color: #475569; line-height: 1.6; margin: 0 0 25px 0; font-size: 16px;">
+                Olá! Recebemos uma solicitação para redefinir a senha da sua conta no sistema. Se foi você, clique no botão abaixo para prosseguir:
+              </p>
+              
+              <!-- CTA Button -->
+              <div style="text-align: center; margin: 35px 0;">
+                <a href="${resetLink}" 
+                   style="display: inline-block; background: linear-gradient(135deg, #325C93 0%, #4a7ab8 100%); color: white; text-decoration: none; padding: 18px 45px; border-radius: 10px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 15px rgba(50,92,147,0.25); transition: transform 0.2s;">
+                  Redefinir Minha Senha
+                </a>
               </div>
-              <p style="color: #888; font-size: 14px;">Se você não solicitou esta alteração, pode ignorar este e-mail.</p>
-              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-              <p style="color: #aaa; font-size: 12px;">Se o botão não funcionar, copie este link: <br> ${resetLink}</p>
+              
+              <p style="color: #64748b; font-size: 14px; line-height: 1.5; margin: 25px 0 0 0; background: #f1f5f9; padding: 15px; border-radius: 8px;">
+                <strong>Segurança:</strong> Por motivos de segurança, este link é válido por apenas 24 horas. Se você não solicitou esta alteração, pode ignorar este e-mail com segurança.
+              </p>
+              
+              <!-- Divider -->
+              <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 35px 0;">
+              
+              <p style="color: #94a3b8; font-size: 12px; margin: 0; text-align: center; line-height: 1.6;">
+                Se o botão não funcionar, copie e cole o link abaixo:<br>
+                <a href="${resetLink}" style="color: #325C93; word-break: break-all; text-decoration: none;">${resetLink}</a>
+              </p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background: #f8fafc; padding: 25px; text-align: center; border-top: 1px solid #f1f5f9;">
+              <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+                © ${new Date().getFullYear()} IMAGO Sistema. Todos os direitos reservados.
+              </p>
             </div>
           </div>
         </body>
