@@ -150,16 +150,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string): Promise<{ error: Error | null }> => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
-    return { error: error ? new Error(error.message) : null };
+    try {
+      const { data, error } = await supabase.functions.invoke("self-register", {
+        body: { email, password, full_name: fullName },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      return { error: null };
+    } catch (error: any) {
+      console.error("Error in signUp:", error);
+      return { error: error instanceof Error ? error : new Error(error.message || "Erro no cadastro") };
+    }
   };
 
   const signOut = async () => {
@@ -172,10 +175,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const requestPasswordReset = async (email: string): Promise<{ error: Error | null }> => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    return { error: error ? new Error(error.message) : null };
+    try {
+      const { data, error } = await supabase.functions.invoke("request-password-reset", {
+        body: { email },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      return { error: null };
+    } catch (error: any) {
+      console.error("Error in requestPasswordReset:", error);
+      return { error: error instanceof Error ? error : new Error(error.message || "Erro desconhecido") };
+    }
   };
 
   const value: AuthContextType = {

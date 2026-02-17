@@ -16,6 +16,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import imagoLogo from "@/assets/imago-logo.png";
 import imagoLoginCover from "@/assets/imago-login-cover.png";
@@ -31,6 +32,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function Register() {
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { signUp } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -42,37 +44,27 @@ export default function Register() {
     const onRegister = async (data: RegisterFormData) => {
         setIsLoading(true);
 
-        // Sign up process with Supabase
-        const { error } = await supabase.auth.signUp({
-            email: data.email,
-            password: data.password,
-            options: {
-                data: {
-                    full_name: data.fullName,
-                },
-            },
-        });
+        try {
+            const { error } = await signUp(data.email, data.password, data.fullName);
 
-        if (error) {
+            if (error) throw error;
+
+            toast({
+                title: "Cadastro realizado!",
+                description: "Verifique seu email para confirmar o cadastro. Sua conta aguardará aprovação.",
+            });
+
+            navigate("/auth");
+        } catch (error: any) {
+            console.error("Error in registration:", error);
             toast({
                 title: "Erro ao cadastrar",
-                description: error.message,
+                description: error.message || "Ocorreu um erro inesperado.",
                 variant: "destructive",
             });
+        } finally {
             setIsLoading(false);
-            return;
         }
-
-        toast({
-            title: "Cadastro realizado!",
-            description: "Sua conta foi criada e está aguardando aprovação do administrador.",
-        });
-
-        // Sign out immediately so they can't access the system yet
-        await supabase.auth.signOut();
-
-        navigate("/auth");
-        setIsLoading(false);
     };
 
     return (

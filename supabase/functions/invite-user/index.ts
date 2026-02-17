@@ -247,8 +247,8 @@ serve(async (req: Request) => {
       console.error("Role error:", roleError);
     }
 
-    const SITE_URL =
-      Deno.env.get("SITE_URL") || "https://gestao.imagoradiologia.cloud";
+    // We force the new domain to be sure it doesn't use the old SITE_URL from Env Vars
+    const SITE_URL = "https://gestao.imagoradiologia.cloud";
 
     const { data: resetData, error: resetError } =
       await supabaseAdmin.auth.admin.generateLink({
@@ -271,8 +271,18 @@ serve(async (req: Request) => {
       // Continue anyway, user can use "forgot password" later
     }
 
-    // Get the action link for the email
-    const resetLink = resetData?.properties?.action_link || "";
+    // Get the action link for the email. 
+    // Sometimes Supabase uses the project's internal URL or an old configured Site URL.
+    let resetLink = resetData?.properties?.action_link || "";
+
+    // Safety check: Ensure the redirect_to is correct in the action_link if Supabase messed it up
+    if (resetLink && !resetLink.includes("gestao.imagoradiologia.cloud")) {
+      console.log("Replacing domain in action link to ensure it points to gestao");
+      // If it contains the old domain, we replace it.
+      resetLink = resetLink.replace("ocorrencias.imagoradiologia.cloud", "gestao.imagoradiologia.cloud");
+      resetLink = resetLink.replace("gesto.imagoradiologia.cloud", "gestao.imagoradiologia.cloud");
+      resetLink = resetLink.replace("teste.imagoradiologia.cloud", "gestao.imagoradiologia.cloud");
+    }
 
     console.log(`Sending invite email to ${email}`);
 
