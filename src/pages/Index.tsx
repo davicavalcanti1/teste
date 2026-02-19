@@ -131,6 +131,28 @@ export default function Index() {
               </p>
             </CardContent>
           </Card>
+
+          {/* Card 5: Farol */}
+          <Card className="group relative overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 bg-white">
+            <div className="absolute top-0 w-full h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            <CardHeader>
+              <div className="h-12 w-12 rounded bg-primary/5 flex items-center justify-center mb-4 transition-colors duration-300">
+                <Gauge className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="text-xl">Farol</CardTitle>
+              <CardDescription>Gestão de Filas</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="w-full bg-primary text-white hover:bg-primary/90"
+                  onClick={() => navigate('/ultrassom')}
+                >
+                  Ultrassom
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Future Steps Section */}

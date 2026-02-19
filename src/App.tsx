@@ -53,6 +53,7 @@ import CilindrosForm from "./features/inspections/pages/forms/CilindrosForm";
 import CilindroConfirmacao from "./features/inspections/pages/CilindroConfirmacao";
 import DEAForm from "./features/inspections/pages/forms/DEAForm";
 import DEAPublicDetail from "./features/inspections/pages/DEAPublicDetail";
+import FarolUsg from "./pages/FarolUsg";
 
 
 
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/paciente" element={<PublicPatientOccurrence />} />
+            <Route path="/ultrassom" element={<FarolUsg />} />
 
             {/* Cylinder Confirmation - Public Route (Moved to top for priority) */}
             <Route path="/inspecoes/cilindros/confirmar/:token" element={<CilindroConfirmacao />} />
