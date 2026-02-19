@@ -30,7 +30,7 @@ export default function OcorrenciasMenu() {
                     {/* Dashboard */}
                     <Button
                         onClick={() => navigate("/ocorrencias/dashboard")}
-                        className="h-48 text-xl flex flex-col gap-4 bg-indigo-600 hover:bg-indigo-700 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                        className="h-48 text-xl flex flex-col gap-4 bg-primary hover:bg-primary/90 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
                     >
                         <div className="p-4 rounded-full bg-white/20">
                             <BarChart3 className="h-12 w-12" />
@@ -42,7 +42,7 @@ export default function OcorrenciasMenu() {
                     {/* Histórico */}
                     <Button
                         onClick={() => navigate("/ocorrencias/historico")}
-                        className="h-48 text-xl flex flex-col gap-4 bg-emerald-600 hover:bg-emerald-700 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                        className="h-48 text-xl flex flex-col gap-4 bg-primary hover:bg-primary/90 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
                     >
                         <div className="p-4 rounded-full bg-white/20">
                             <History className="h-12 w-12" />

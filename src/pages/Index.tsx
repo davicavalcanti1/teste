@@ -23,42 +23,40 @@ export default function Index() {
       <div className="space-y-8 p-4 md:p-8 animate-in fade-in duration-500">
 
         {/* Hero Section */}
-        <section className="relative rounded-3xl bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-8 md:p-12 text-white shadow-2xl overflow-hidden min-h-[400px] flex flex-col justify-center">
-          {/* Decorative circles/blobs */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl"></div>
+        <section className="relative rounded-lg bg-primary p-8 md:p-16 text-white shadow-xl overflow-hidden min-h-[400px] flex flex-col justify-center">
+          {/* Subtle Decorative Elements */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-96 w-96 rounded-full bg-white/5 blur-3xl"></div>
 
-          {/* Decorative grid pattern */}
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
 
           <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-1 text-sm font-medium text-blue-100 backdrop-blur-md border border-blue-400/30 mb-6">
-              <span className="flex h-2 w-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
-              Nova Versão Disponível
+            <div className="inline-flex items-center rounded bg-white/10 px-3 py-1 text-xs font-medium text-blue-100 backdrop-blur-md border border-white/20 mb-6 uppercase tracking-wider">
+              <span className="flex h-2 w-2 rounded-full bg-success mr-2 animate-pulse"></span>
+              Plataforma Operacional
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
               Imago 2.0
             </h1>
             <p className="text-lg md:text-xl text-blue-100/90 leading-relaxed mb-8 max-w-2xl">
-              Bem-vindo à evolução da nossa plataforma de controle operacional.
-              Uma interface moderna, novos módulos de inspeção e ferramentas desenhadas para transformar sua rotina.
+              Bem-vindo à evolução do controle operacional. Uma interface moderna e ferramentas robustas desenhadas para a excelência na saúde.
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Button
                 size="lg"
-                className="bg-white text-blue-900 hover:bg-blue-50 hover:text-blue-950 font-bold rounded-full px-8 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                className="bg-white text-primary hover:bg-white/90 font-bold rounded px-8 shadow-lg transition-all"
                 onClick={() => navigate('/inspecoes')}
               >
-                Ver Inspeções <ArrowRight className="ml-2 h-5 w-5" />
+                Painel de Inspeções <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-blue-400 text-blue-100 hover:bg-blue-800/50 hover:text-white rounded-full px-8 backdrop-blur-sm"
+                className="border-white/30 text-white hover:bg-white/10 rounded px-8 backdrop-blur-sm"
                 onClick={() => navigate('/funcionarios')}
               >
-                Funcionários
+                Gerenciar Equipe
               </Button>
             </div>
           </div>
@@ -67,14 +65,14 @@ export default function Index() {
         {/* New Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Card 1: Cilindros */}
-          <Card className="group relative overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white cursor-default">
-            <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          <Card className="group relative overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 bg-white">
+            <div className="absolute top-0 w-full h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <CardHeader>
-              <div className="h-12 w-12 rounded-2xl bg-cyan-50 flex items-center justify-center mb-4 group-hover:bg-cyan-100 transition-colors duration-300">
-                <Gauge className="h-6 w-6 text-cyan-600" />
+              <div className="h-12 w-12 rounded bg-primary/5 flex items-center justify-center mb-4 transition-colors duration-300">
+                <Gauge className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="text-xl">Cilindros</CardTitle>
-              <CardDescription>Controle & Segurança</CardDescription>
+              <CardDescription>Protocolo de Inspeção</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm leading-relaxed">
@@ -84,14 +82,14 @@ export default function Index() {
           </Card>
 
           {/* Card 2: Funcionários */}
-          <Card className="group relative overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white cursor-default">
-            <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-violet-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          <Card className="group relative overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 bg-white">
+            <div className="absolute top-0 w-full h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <CardHeader>
-              <div className="h-12 w-12 rounded-2xl bg-violet-50 flex items-center justify-center mb-4 group-hover:bg-violet-100 transition-colors duration-300">
-                <Users className="h-6 w-6 text-violet-600" />
+              <div className="h-12 w-12 rounded bg-primary/5 flex items-center justify-center mb-4 transition-colors duration-300">
+                <Users className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle className="text-xl">Funcionários</CardTitle>
-              <CardDescription>Gestão de Equipe</CardDescription>
+              <CardTitle className="text-xl">Equipe</CardTitle>
+              <CardDescription>Gestão Profissional</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm leading-relaxed">
@@ -101,14 +99,14 @@ export default function Index() {
           </Card>
 
           {/* Card 3: Copa */}
-          <Card className="group relative overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white cursor-default">
-            <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          <Card className="group relative overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 bg-white">
+            <div className="absolute top-0 w-full h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <CardHeader>
-              <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-4 group-hover:bg-amber-100 transition-colors duration-300">
-                <Coffee className="h-6 w-6 text-amber-600" />
+              <div className="h-12 w-12 rounded bg-primary/5 flex items-center justify-center mb-4 transition-colors duration-300">
+                <Coffee className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle className="text-xl">Copa</CardTitle>
-              <CardDescription>Água & Café</CardDescription>
+              <CardTitle className="text-xl">Amenidades</CardTitle>
+              <CardDescription>Suprimentos e Copa</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm leading-relaxed">
@@ -118,14 +116,14 @@ export default function Index() {
           </Card>
 
           {/* Card 4: DEA */}
-          <Card className="group relative overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white cursor-default">
-            <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-rose-500 to-red-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          <Card className="group relative overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 bg-white">
+            <div className="absolute top-0 w-full h-1 bg-primary transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <CardHeader>
-              <div className="h-12 w-12 rounded-2xl bg-rose-50 flex items-center justify-center mb-4 group-hover:bg-rose-100 transition-colors duration-300">
-                <Battery className="h-6 w-6 text-rose-600" />
+              <div className="h-12 w-12 rounded bg-primary/5 flex items-center justify-center mb-4 transition-colors duration-300">
+                <Battery className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="text-xl">DEA</CardTitle>
-              <CardDescription>Equipamentos Vitais</CardDescription>
+              <CardDescription>Manutenção de Equipamentos</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm leading-relaxed">
@@ -145,7 +143,7 @@ export default function Index() {
               </h2>
               <p className="text-slate-600 mt-2 text-lg">Próximos passos para uma operação cada vez mais inteligente.</p>
             </div>
-            <Badge variant="outline" className="px-4 py-1.5 border-blue-200 text-blue-700 bg-blue-50/50 rounded-full text-sm font-semibold">
+            <Badge variant="outline" className="px-4 py-1.5 border-primary/20 text-primary bg-primary/5 rounded-full text-sm font-semibold">
               Roadmap 2026
             </Badge>
           </div>

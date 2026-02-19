@@ -266,13 +266,13 @@ export default function Inspections() {
 
     const getIcon = (tipo: string) => {
         switch (tipo) {
-            case 'ar_condicionado': return <Snowflake className="h-4 w-4 text-blue-500" />;
-            case 'banheiro': return <Bath className="h-4 w-4 text-orange-500" />;
-            case 'dispenser': return <Droplets className="h-4 w-4 text-cyan-500" />;
-            case 'cilindros': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
-            case 'cafe_agua': return <Coffee className="h-4 w-4 text-amber-600" />;
-            case 'dea': return <Battery className="h-4 w-4 text-rose-600" />;
-            default: return <CheckCircle2 className="h-4 w-4" />;
+            case 'ar_condicionado': return <Snowflake className="h-4 w-4 text-primary" />;
+            case 'banheiro': return <Bath className="h-4 w-4 text-primary" />;
+            case 'dispenser': return <Droplets className="h-4 w-4 text-primary" />;
+            case 'cilindros': return <CheckCircle2 className="h-4 w-4 text-primary" />;
+            case 'cafe_agua': return <Coffee className="h-4 w-4 text-primary" />;
+            case 'dea': return <Battery className="h-4 w-4 text-primary" />;
+            default: return <CheckCircle2 className="h-4 w-4 text-primary" />;
         }
     };
 
@@ -353,17 +353,17 @@ export default function Inspections() {
 
                 <Tabs defaultValue="overview" className="w-full">
                     <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-white border shadow-sm rounded-xl mb-4">
-                        <TabsTrigger value="overview" className="py-2.5 rounded-lg data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">Visão Geral</TabsTrigger>
-                        <TabsTrigger value="dispenser" className="py-2.5 rounded-lg data-[state=active]:bg-cyan-50 data-[state=active]:text-cyan-700">Dispensers</TabsTrigger>
-                        <TabsTrigger value="banheiro" className="py-2.5 rounded-lg data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700">Banheiros</TabsTrigger>
-                        <TabsTrigger value="ac" className="py-2.5 rounded-lg data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700">Climatização</TabsTrigger>
-                        <TabsTrigger value="reports" className="py-2.5 rounded-lg data-[state=active]:bg-gray-100">Relatórios</TabsTrigger>
+                        <TabsTrigger value="overview" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Visão Geral</TabsTrigger>
+                        <TabsTrigger value="dispenser" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Dispensers</TabsTrigger>
+                        <TabsTrigger value="banheiro" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Banheiros</TabsTrigger>
+                        <TabsTrigger value="ac" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Climatização</TabsTrigger>
+                        <TabsTrigger value="reports" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Relatórios</TabsTrigger>
 
                         {/* New Placeholders */}
-                        <TabsTrigger value="cilindros" className="py-2.5 rounded-lg data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700">Cilindros</TabsTrigger>
-                        <TabsTrigger value="chiller" className="py-2.5 rounded-lg data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700">Chiller</TabsTrigger>
-                        <TabsTrigger value="dea" className="py-2.5 rounded-lg data-[state=active]:bg-rose-50 data-[state=active]:text-rose-700">DEA</TabsTrigger>
-                        <TabsTrigger value="cafe_agua" className="py-2.5 rounded-lg data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700">Café e Água</TabsTrigger>
+                        <TabsTrigger value="cilindros" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Cilindros</TabsTrigger>
+                        <TabsTrigger value="chiller" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Chiller</TabsTrigger>
+                        <TabsTrigger value="dea" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">DEA</TabsTrigger>
+                        <TabsTrigger value="cafe_agua" className="py-2.5 rounded-lg data-[state=active]:bg-primary/10 data-[state=active]:text-primary">Café e Água</TabsTrigger>
                     </TabsList>
 
                     {/* --- Visão Geral --- */}
@@ -411,8 +411,8 @@ export default function Inspections() {
                     {/* --- Dispensers --- */}
                     <TabsContent value="dispenser" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-cyan-800">Dashboard de Dispensers</h2>
-                            <Badge variant="outline" className="text-cyan-600 bg-cyan-50">{dispenserData.length} Registros</Badge>
+                            <h2 className="text-lg font-semibold text-primary">Dashboard de Dispensers</h2>
+                            <Badge variant="outline" className="text-primary bg-primary/5">{dispenserData.length} Registros</Badge>
                         </div>
                         <InspectionCharts data={dispenserData} type="dispenser" />
                         {renderTable(dispenserData, "Nenhuma inspeção de dispenser encontrada.")}
@@ -421,8 +421,8 @@ export default function Inspections() {
                     {/* --- Banheiros --- */}
                     <TabsContent value="banheiro" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-orange-800">Dashboard de Banheiros</h2>
-                            <Badge variant="outline" className="text-orange-600 bg-orange-50">{banheiroData.length} Registros</Badge>
+                            <h2 className="text-lg font-semibold text-primary">Dashboard de Banheiros</h2>
+                            <Badge variant="outline" className="text-primary bg-primary/5">{banheiroData.length} Registros</Badge>
                         </div>
                         <InspectionCharts data={banheiroData} type="banheiro" />
                         {renderTable(banheiroData, "Nenhuma inspeção de banheiro encontrada.")}
@@ -431,8 +431,8 @@ export default function Inspections() {
                     {/* --- AC --- */}
                     <TabsContent value="ac" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-blue-800">Painel de Climatização</h2>
-                            <Badge variant="outline" className="text-blue-600 bg-blue-50">{acData.length} Registros</Badge>
+                            <h2 className="text-lg font-semibold text-primary">Painel de Climatização</h2>
+                            <Badge variant="outline" className="text-primary bg-primary/5">{acData.length} Registros</Badge>
                         </div>
 
                         <ACManagement
@@ -454,8 +454,8 @@ export default function Inspections() {
                     {/* --- Cilindros --- */}
                     <TabsContent value="cilindros" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-purple-800">Dashboard de Cilindros</h2>
-                            <Badge variant="outline" className="text-purple-600 bg-purple-50">{cilindrosData.length} Registros</Badge>
+                            <h2 className="text-lg font-semibold text-primary">Dashboard de Cilindros</h2>
+                            <Badge variant="outline" className="text-primary bg-primary/5">{cilindrosData.length} Registros</Badge>
                         </div>
                         <InspectionCharts data={cilindrosData} type="cilindros" />
                         {renderTable(cilindrosData, "Nenhuma inspeção de cilindros encontrada.")}
@@ -464,8 +464,8 @@ export default function Inspections() {
                     {/* --- Cafe e Agua --- */}
                     <TabsContent value="cafe_agua" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-amber-800">Dashboard de Copa</h2>
-                            <Badge variant="outline" className="text-amber-600 bg-amber-50">{copaData.length} Registros</Badge>
+                            <h2 className="text-lg font-semibold text-primary">Dashboard de Copa</h2>
+                            <Badge variant="outline" className="text-primary bg-primary/5">{copaData.length} Registros</Badge>
                         </div>
                         <InspectionCharts data={copaData} type="cafe_agua" />
                         {renderTable(copaData, "Nenhuma solicitação de copa encontrada.")}
@@ -474,8 +474,8 @@ export default function Inspections() {
                     {/* --- DEA --- */}
                     <TabsContent value="dea" className="mt-6 space-y-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <h2 className="text-lg font-semibold text-rose-800">Dashboard de DEA (Desfibrilador)</h2>
-                            <Badge variant="outline" className="text-rose-600 bg-rose-50">{deaData.length} Registros</Badge>
+                            <h2 className="text-lg font-semibold text-primary">Dashboard de DEA (Desfibrilador)</h2>
+                            <Badge variant="outline" className="text-primary bg-primary/5">{deaData.length} Registros</Badge>
                         </div>
                         {renderTable(deaData, "Nenhum registro de DEA encontrado.")}
                     </TabsContent>
