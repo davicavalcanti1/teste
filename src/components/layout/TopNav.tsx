@@ -12,7 +12,8 @@ import {
   SlidersHorizontal,
   Package,
   BookOpen,
-  CheckCircle2
+  CheckCircle2,
+  Gauge
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -48,6 +49,7 @@ export function TopNav() {
     { href: "/analise", label: "Análise", icon: SlidersHorizontal, adminOnly: true },
     { href: "/relatorios", label: "Dashboard", icon: BarChart3, adminOnly: false },
     { href: "/livro", label: "Livro", icon: BookOpen, adminOnly: false },
+    { href: "/ultrassom", label: "Farol USG", icon: Gauge, adminOnly: false },
 
   ].filter(link => {
     if (link.adminOnly && !isAdmin) return false;

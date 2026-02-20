@@ -13,7 +13,8 @@ import {
     BookOpen,
     CheckCircle2,
     MoreVertical,
-    ClipboardList
+    ClipboardList,
+    Gauge
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -46,6 +47,7 @@ export function Sidebar() {
         { href: "/inspecoes", label: "Inspeções", icon: CheckCircle2, adminOnly: true },
         { href: "/analise", label: "Anamnese", icon: ClipboardList, adminOnly: true },
         { href: "/livro", label: "Livro", icon: BookOpen, adminOnly: false },
+        { href: "/ultrassom", label: "Farol USG", icon: Gauge, adminOnly: false },
         { href: "/funcionarios", label: "Funcionários", icon: User, allowedRoles: ['admin', 'rh'] },
     ].filter(link => {
         if (link.adminOnly && !isAdmin) return false;
