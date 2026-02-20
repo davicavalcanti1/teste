@@ -17,6 +17,7 @@ import Perfil from "./pages/Perfil";
 import NotFound from "./pages/NotFound";
 import Instructions from "./pages/Instructions";
 import Employees from "./pages/Employees";
+import FarolUsg from "./features/farol/pages/FarolUsg";
 
 // Occurrence pages
 import OcorrenciasMenu from "./features/occurrences/pages/OcorrenciasMenu";
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/paciente" element={<PublicPatientOccurrence />} />
+            <Route path="/ultrassom" element={<FarolUsg />} />
 
             {/* Cylinder Confirmation - Public Route (Moved to top for priority) */}
             <Route path="/inspecoes/cilindros/confirmar/:token" element={<CilindroConfirmacao />} />
